@@ -1,0 +1,16 @@
+name: AL
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - python=3.9
+  - numpy
+  - numpy-base
+  - matplotlib
+  - matplotlib-base
+  - scipy
+  - pandas
+  - pillow
+  - seaborn
+  - tqdm
+  - statsmodels
