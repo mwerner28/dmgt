@@ -1,12 +1,7 @@
 import torch
 import pandas as pd
 
-def dmgt_df(data,
-            init_pts,
-            imbals,
-            taus,
-            trials,
-            num_sel_rnds):
+def dmgt_df(data, init_pts, imbals, taus, trials, num_sel_rnds):
 
     rare_acc, all_acc, sizes, sum_sizes = data
     
