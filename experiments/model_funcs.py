@@ -30,9 +30,7 @@ class LogRegModel(nn.Module):
         x = self.linear(x)
         return x
 
-def load_model(model,
-               device,
-               *args):
+def load_model(model, device, *args):
     
     if len(args) > 0:
         embed_dim, num_classes = args
@@ -44,11 +42,7 @@ def load_model(model,
     model_copy = model_copy.to(device)
     return model_copy
 
-def train(device,
-          num_epochs,
-          train_loader,
-          class_dict,
-          model):
+def train(device, num_epochs, train_loader, model):
    
     model = model.to(device)
     
@@ -83,9 +77,7 @@ def train(device,
     return model
 
 # helper function for deep-copying model
-def calc_acc(model,
-             test_loader,
-             num_classes):
+def calc_acc(model, test_loader, num_classes):
 
     model.eval()
     
