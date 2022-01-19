@@ -1,11 +1,7 @@
-import numpy as np
-from numpy import genfromtxt
+import numpy as 
 import random
 import torch 
 from torch.utils.data import DataLoader, TensorDataset
-from torchvision.models import resnet50
-import pandas as pd
-from os.path import exists as file_exists
 from ../helper_funcs import class_card, get_subsets
 from ../model_funcs import Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
 from ../data_funcs/imnet import get_embed_loader, get_embeds, get_test_embed_loader, get_test_loader
@@ -139,16 +135,6 @@ def experiment(init_pts,
                         
                         
     return rare_acc, all_acc, sizes, sum_sizes
-
-def get_base_model(weights_path, num_classes, device):
-    
-    model = resnet50(pretrained=False).to(device)
-    checkpoint = torch.load(weights_path, map_location=device)
-    state_dict = checkpoint['state_dict']
-    model.load_state_dict(state_dict, strict=False)
-    
-    return model
-
 
 def train_init_model(test_embeds_loader,
                      num_init_pts,
