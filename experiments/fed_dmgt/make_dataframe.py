@@ -1,9 +1,7 @@
 import torch
 import pandas as pd
 
-def fed_dmgt_df(data,
-                trials,
-                num_sel_rnds):
+def fed_dmgt_df(data, trials, num_sel_rnds):
 
     rare_acc, all_acc, sizes, sum_sizes = data
     
