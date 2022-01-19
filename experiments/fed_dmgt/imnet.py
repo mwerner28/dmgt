@@ -1,16 +1,12 @@
 import numpy as np
 from numpy import genfromtxt
 import random
-
 import torch 
 from torch.utils.data import DataLoader, TensorDataset
 from torchvision.models import resnet50
-
 import pandas as pd
-
 from os.path import exists as file_exists
 import argparse
-
 from ../helper_funcs import class_card, get_subsets
 from ../model_funcs import Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
 from ../data_funcs/imnet import get_embed_loader, get_embeds, get_test_embed_loader, get_test_loader
@@ -89,18 +85,8 @@ def experiment(num_init_pts,
     stream_datasets_dict = {key: None for key in range(num_agents)}
 
     for agent in range(num_agents):
-        
-        agent_init_dataset, agent_stream_dataset = get_datasets(embeds,
-                                                                labels,
-                                                                imbals[agent],
-                                                                num_init_pts,
-                                                                num_classes)
-
-        agent_init_loader = DataLoader(agent_init_dataset,
-                                       batch_size=num_init_pts,
-                                       num_workers=num_workers,
-                                       shuffle=True)
-
+        agent_init_dataset, agent_stream_dataset = get_datasets(embeds, labels, imbals[agent], num_init_pts, num_classes)
+        agent_init_loader = DataLoader(agent_init_dataset, batch_size=num_init_pts, num_workers=num_workers, shuffle=True)
         agent_init_samples = enumerate(agent_init_loader)
         _, (agent_init_x, agent_init_y) = next(agent_init_samples)
 
@@ -114,34 +100,23 @@ def experiment(num_init_pts,
 
     sum_sizes[:,0] = len(init_x)
 
-    init_loader = DataLoader(TensorDataset(init_x, init_y),
-                             batch_size=batch_size,
-                             num_workers=num_workers,
-                             shuffle=True)
+    init_loader = DataLoader(TensorDataset(init_x, init_y), batch_size=batch_size, num_workers=num_workers, shuffle=True)
 
     model = LogRegModel(embed_dim, num_classes) 
-    
-    model = train(device,
-                  num_epochs,
-                  init_loader,
-                  class_dict,
-                  model)
+    model = train(device, num_epochs, init_loader, model)
         
     rare_isoreg = train_isoreg(model, rare_val_embeds_loader)
     common_isoreg = train_isoreg(model, common_val_embeds_loader)
     
     rare_acc[:,0] = (
-
             torch.cat((calc_acc(model, test_embeds_loader, num_classes)[0], 
                        calc_acc(model, test_embeds_loader, num_classes)[0])))
     
     all_acc[:,0] = (
-            
             torch.cat((calc_acc(model, test_embeds_loader, num_classes)[1],
                        calc_acc(model, test_embeds_loader, num_classes)[1])))
     
     for trial in trials:
-        
         FED_DMGT_model = load_model(model, embed_dim, num_classes, device)
         RAND_model = load_model(model, embed_dim, num_classes, device)
 
@@ -160,18 +135,16 @@ def experiment(num_init_pts,
             RAND_y = torch.empty(0)
 
             for agent in range(num_agents):
-
                 _, (agent_stream_x, agent_stream_y) = next(stream_samples_dict[agent])
-
                 agent_FED_DMGT_x, agent_FED_DMGT_y, agent_RAND_x, agent_RAND_y = get_subsets(agent_stream_x,
-                                                                                 agent_stream_y,
-                                                                                 cost,
-                                                                                 FED_DMGT_model,
-                                                                                 num_classes,
-                                                                                 is_isoreg,
-                                                                                 rare_isoreg,
-                                                                                 common_isoreg,
-                                                                                 device)
+                                                                                             agent_stream_y,
+                                                                                             cost,
+                                                                                             FED_DMGT_model,
+                                                                                             num_classes,
+                                                                                             is_isoreg,
+                                                                                             rare_isoreg,
+                                                                                             common_isoreg,
+                                                                                             device)
 
                 FED_DMGT_x = torch.cat((FED_DMGT_x, agent_FED_DMGT_x))
                 FED_DMGT_y = torch.cat((FED_DMGT_y, agent_FED_DMGT_y))
@@ -179,52 +152,38 @@ def experiment(num_init_pts,
                 RAND_y = torch.cat((RAND_y, agent_RAND_y))
             
             sizes[trial,sel_rnd+1] = (
-
                     sizes[trial,sel_rnd] + 
                     torch.stack((torch.tensor([(FED_DMGT_y==i).sum() for i in range(num_classes)]),
                                  torch.tensor([(RAND_y==i).sum() for i in range(num_classes)]))))
 
             sum_sizes[trial,sel_rnd+1] = (
-
                     torch.tensor([sum_sizes[trial,sel_rnd] + len(FED_DMGT_y)]))
                 
             FED_DMGT_model = train(device,
-                             num_epochs,
-                             DataLoader(TensorDataset(FED_DMGT_x, FED_DMGT_y),
-                                        batch_size=batch_size,
-                                        num_workers=num_workers,
-                                        shuffle=True),
-                             class_dict,
-                             FED_DMGT_model)
+                                   num_epochs,
+                                   DataLoader(TensorDataset(FED_DMGT_x, FED_DMGT_y), batch_size=batch_size, num_workers=num_workers, shuffle=True),
+                                   FED_DMGT_model)
 
             rare_isoreg = train_isoreg(FED_DMGT_model, rare_val_embeds_loader)
             common_isoreg = train_isoreg(FED_DMGT_model, common_val_embeds_loader)
                 
             RAND_model = train(device,
                                num_epochs,
-                               DataLoader(TensorDataset(RAND_x, RAND_y),
-                                          batch_size=batch_size,
-                                          num_workers=num_workers,
-                                          shuffle=True),
-                               class_dict,
+                               DataLoader(TensorDataset(RAND_x, RAND_y), batch_size=batch_size, num_workers=num_workers, shuffle=True),
                                RAND_model)
             
             rare_acc[trial,sel_rnd+1] = (
-
                     torch.cat((calc_acc(FED_DMGT_model, test_embeds_loader, num_classes)[0], 
                                calc_acc(RAND_model, test_embeds_loader, num_classes)[0])))
             
             all_acc[trial,sel_rnd+1] = (
-                    
                     torch.cat((calc_acc(FED_DMGT_model, test_embeds_loader, num_classes)[1],
                                calc_acc(RAND_model, test_embeds_loader, num_classes)[1])))
         
     return rare_acc, all_acc, sizes, sum_sizes
 
 ### Helper Function
-def get_base_model(weights_path,
-                   num_classes,
-                   device):
+def get_base_model(weights_path, num_classes, device):
     
     model = resnet50(pretrained=False).to(device)
     checkpoint = torch.load(weights_path, map_location=device)
