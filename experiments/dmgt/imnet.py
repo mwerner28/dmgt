@@ -1,16 +1,11 @@
 import numpy as np
 from numpy import genfromtxt
 import random
-
 import torch 
 from torch.utils.data import DataLoader, TensorDataset
 from torchvision.models import resnet50
-
 import pandas as pd
-
 from os.path import exists as file_exists
-import argparse
-
 from ../helper_funcs import class_card, get_subsets
 from ../model_funcs import Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
 from ../data_funcs/imnet import get_embed_loader, get_embeds, get_test_embed_loader, get_test_loader
@@ -111,10 +106,7 @@ def experiment(init_pts,
                     DMGT_model = load_model(model, device, embed_dim, num_classes)
                     RAND_model = load_model(model, device, embed_dim, num_classes)
 
-                    stream_loader = DataLoader(stream_dataset,
-                                               batch_size=stream_size,
-                                               num_workers=num_workers,
-                                               shuffle=True)
+                    stream_loader = DataLoader(stream_dataset, batch_size=stream_size, num_workers=num_workers, shuffle=True)
                     
                     stream_samples = enumerate(stream_loader)
                     
@@ -148,9 +140,7 @@ def experiment(init_pts,
                         
     return rare_acc, all_acc, sizes, sum_sizes
 
-def get_base_model(weights_path,
-                   num_classes,
-                   device):
+def get_base_model(weights_path, num_classes, device):
     
     model = resnet50(pretrained=False).to(device)
     checkpoint = torch.load(weights_path, map_location=device)
@@ -179,16 +169,9 @@ def train_init_model(test_embeds_loader,
                      labels,
                      device):
 
-    init_dataset, stream_dataset = get_datasets(embeds,
-                                                labels,
-                                                num_init_pts,
-                                                imbal,
-                                                num_classes)
+    init_dataset, stream_dataset = get_datasets(embeds, labels, num_init_pts, imbal, num_classes)
 
-    init_loader = DataLoader(init_dataset,
-                             batch_size=num_init_pts,
-                             num_workers=num_workers,
-                             shuffle=True)
+    init_loader = DataLoader(init_dataset, batch_size=num_init_pts, num_workers=num_workers, shuffle=True)
 
     init_samples = enumerate(init_loader)
     _, (init_x, init_y) = next(init_samples)
@@ -200,19 +183,10 @@ def train_init_model(test_embeds_loader,
 
     sum_sizes[:,:,:,:,0] = num_init_pts
 
-    init_loader = DataLoader(TensorDataset(init_x, init_y),
-                             batch_size=batch_size,
-                             num_workers=num_workers,
-                             shuffle=True)
+    init_loader = DataLoader(TensorDataset(init_x, init_y), batch_size=batch_size, num_workers=num_workers, shuffle=True)
 
     model = LogRegModel(embed_dim, num_classes) 
-
-    model = train(device,
-                  num_epochs,
-                  init_loader,
-                  class_dict,
-                  model)
-
+    model = train(device, num_epochs, init_loader, model)
 
     rare_acc[:,:,:,:,0] = (
 
@@ -253,14 +227,7 @@ def update_models(DMGT_model,
     rare_isoreg = train_isoreg(DMGT_model, rare_val_embeds_loader)
     common_isoreg = train_isoreg(DMGT_model, common_val_embeds_loader)
 
-    DMGT_x, DMGT_y, RAND_x, RAND_y = get_subsets(stream_x,
-                                               stream_y,
-                                               tau,
-                                               DMGT_model,
-                                               num_classes,
-                                               rare_isoreg,
-                                               common_isoreg,
-                                               device)
+    DMGT_x, DMGT_y, RAND_x, RAND_y = get_subsets(stream_x, stream_y, tau, DMGT_model, num_classes, rare_isoreg, common_isoreg, device)
 
     sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
             
@@ -272,21 +239,13 @@ def update_models(DMGT_model,
             torch.tensor([sum_sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd] + len(DMGT_y)]))
         
     DMGT_model = train(device,
-                      num_epochs,
-                      DataLoader(TensorDataset(DMGT_x, DMGT_y),
-                                 batch_size=batch_size,
-                                 num_workers=num_workers,
-                                 shuffle=True),
-                      class_dict,
-                      DMGT_model)
+                       num_epochs,
+                       DataLoader(TensorDataset(DMGT_x, DMGT_y), batch_size=batch_size, num_workers=num_workers, shuffle=True),
+                       DMGT_model)
 
     RAND_model = train(device,
                        num_epochs,
-                       DataLoader(TensorDataset(RAND_x, RAND_y),
-                                  batch_size=batch_size,
-                                  num_workers=num_workers,
-                                  shuffle=True),
-                       class_dict,
+                       DataLoader(TensorDataset(RAND_x, RAND_y), batch_size=batch_size, num_workers=num_workers, shuffle=True),
                        RAND_model)
     
     rare_acc[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
