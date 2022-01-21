@@ -17,7 +17,7 @@ from make_dataframe import fed_dmgt_df
 # main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(num_init_pts,
                imbals,
-               costs,
+               taus,
                trials,
                num_algs,
                num_agents,
@@ -127,12 +127,12 @@ def experiment(num_init_pts,
             RAND_y = torch.empty(0)
 
             for agent in range(num_agents):
-                cost = costs[agent]
+                tau = taus[agent]
 
                 _, (agent_stream_x, agent_stream_y) = next(stream_samples_dict[agent])
                 agent_FED_DMGT_x, agent_FED_DMGT_y, agent_RAND_x, agent_RAND_y = get_subsets(agent_stream_x,
                                                                                              agent_stream_y,
-                                                                                             cost,
+                                                                                             tau,
                                                                                              FED_DMGT_model,
                                                                                              num_classes,
                                                                                              is_isoreg,
