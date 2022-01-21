@@ -29,7 +29,7 @@ parser.add_argument('--imnet_data_dir', type=str, default=STORE IMAGNET-TRAIN HE
 parser.add_argument('--imnet_test_dir', type=str, default=STORE IMAGENET-VAL HERE IN THIS DIRECTORY)
 parser.add_argument('--imnet_folder_to_class_file', type=str, default='../../imagenet_datafiles/folder_to_class.txt')
 parser.add_argument('--imnet_test_label_file', type=str, default='../../imagenet_datafiles/test_classes.txt')
-parser.add_argument('--imnet_smclr_weights_path', type=str, default=STORE PRETRAINED SIMCLR RESNET50 MODEL HERE) 
+parser.add_argument('--imnet_smclr_weights_path', type=str, default=STORE PRETRAINED SIMCLR RESNET50 MODEL HERE(can find it here: 'https://github.com/tonylins/simclr-converter' -- we use ResNet50(1x))) 
 
 if __name__ == "__main__":
     
