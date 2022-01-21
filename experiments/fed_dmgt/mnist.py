@@ -1,3 +1,4 @@
+# import libraries
 import numpy as np
 import random
 import torch 
@@ -6,10 +7,13 @@ import pandas as pd
 import os
 from os.path import exists as file_exists
 import argparse
+# import helper functions
 from ../helper_funcs import class_card, get_subsets
 from ../model_funcs import MnistResNet, train, load_model, calc_acc, train_isoreg
 from ../data_funcs/mnist import get_datasets, get_val_loaders
+from make_dataframe import fed_dmgt_df
 
+# main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(num_init_pts,
                imbals,
                tau,
@@ -140,5 +144,7 @@ def experiment(num_init_pts,
                     torch.cat((calc_acc(FED_DMGT_model, test_loader, num_classes)[1],
                                calc_acc(RAND_model, test_loader, num_classes)[1])))
 
-    return rare_acc, all_acc, sizes, sum_sizes
+    df = fed_dmgt_df(rare_acc, all_acc, sizes, sum_sizes, trials, num_sel_rnds)
+    
+    return df
 

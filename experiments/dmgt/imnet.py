@@ -1,11 +1,15 @@
+# import libraries
 import numpy as 
 import random
 import torch 
 from torch.utils.data import DataLoader, TensorDataset
+# import helper functions
 from ../helper_funcs import class_card, get_subsets
 from ../model_funcs import Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
-from ../data_funcs/imnet import get_embed_loader, get_embeds, get_test_embed_loader, get_test_loader
+from ../data_funcs/imnet import get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
+from make_dataframe import dmgt_df
 
+# main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(init_pts,
                imbals,
                taus,
@@ -25,11 +29,6 @@ def experiment(init_pts,
                folder_to_class_file,
                test_label_file,
                weights_path,
-               embeds_path,
-               embeds_labels_path,
-               idx_conv_dict_path,
-               test_embeds_path,
-               test_embeds_labels_path,
                num_sel_rnds):
     
     rare_acc=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,num_algs)
@@ -37,7 +36,6 @@ def experiment(init_pts,
     
     sizes=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,num_algs,num_classes)
     sum_sizes=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,1)
-    
     
     classes = random.sample(list(np.arange(1000)), num_classes)
     
@@ -52,26 +50,20 @@ def experiment(init_pts,
                                                num_classes,
                                                num_workers,
                                                weights_path,
-                                               embeds_path,
-                                               embeds_labels_path,
-                                               idx_conv_dict_path,
                                                folder_to_class_file,
                                                device)
     
-    test_embeds_loader, rare_val_embeds_loader, common_val_embeds_loader, val_embeds_loader = get_test_embed_loader(embed_dim,
-                                                                                                                    embed_batch_size,
-                                                                                                                    batch_size,
-                                                                                                                    num_classes,
-                                                                                                                    num_workers,
-                                                                                                                    weights_path,
-                                                                                                                    test_dir,
-                                                                                                                    test_embeds_path,
-                                                                                                                    test_embeds_labels_path,
-                                                                                                                    test_label_file,
-                                                                                                                    class_dict,
-                                                                                                                    num_test_pts,
-                                                                                                                    idx_conv_dict,
-                                                                                                                    device)
+    test_embeds_loader, rare_val_embeds_loader, common_val_embeds_loader, val_embeds_loader = get_test_embed_loaders(embed_dim,
+                                                                                                                     embed_batch_size,
+                                                                                                                     batch_size,
+                                                                                                                     num_classes,
+                                                                                                                     num_workers,
+                                                                                                                     weights_path,
+                                                                                                                     test_dir,
+                                                                                                                     test_label_file,
+                                                                                                                     class_dict,
+                                                                                                                     num_test_pts,
+                                                                                                                     device)
     for init_pts_idx, num_init_pts in enumerate(init_pts):
         for imbal_idx, imbal in enumerate(imbals):
             
@@ -103,39 +95,42 @@ def experiment(init_pts,
                     RAND_model = load_model(model, device, embed_dim, num_classes)
 
                     stream_loader = DataLoader(stream_dataset, batch_size=stream_size, num_workers=num_workers, shuffle=True)
-                    
                     stream_samples = enumerate(stream_loader)
                     
                     for sel_rnd in range(num_sel_rnds):
                         _, (stream_x, stream_y) = next(stream_samples)
                         
                         DMGT_model, RAND_model, sizes, sum_sizes, rare_acc, all_acc = update_models(DMGT_model,
-                                                                                                   RAND_model,
-                                                                                                   rare_val_embeds_loader,
-                                                                                                   common_val_embeds_loader,
-                                                                                                   test_embeds_loader,
-                                                                                                   stream_x,
-                                                                                                   stream_y,
-                                                                                                   init_pts_idx,
-                                                                                                   imbal_idx,
-                                                                                                   tau_idx,
-                                                                                                   tau,
-                                                                                                   trial,
-                                                                                                   sel_rnd,
-                                                                                                   num_epochs,
-                                                                                                   batch_size,
-                                                                                                   num_workers,
-                                                                                                   num_classes,
-                                                                                                   sizes,
-                                                                                                   sum_sizes,
-                                                                                                   rare_acc,
-                                                                                                   all_acc,
-                                                                                                   class_dict,
-                                                                                                   device)
-                        
-                        
-    return rare_acc, all_acc, sizes, sum_sizes
+                                                                                                    RAND_model,
+                                                                                                    rare_val_embeds_loader,
+                                                                                                    common_val_embeds_loader,
+                                                                                                    test_embeds_loader,
+                                                                                                    stream_x,
+                                                                                                    stream_y,
+                                                                                                    init_pts_idx,
+                                                                                                    imbal_idx,
+                                                                                                    tau_idx,
+                                                                                                    tau,
+                                                                                                    trial,
+                                                                                                    sel_rnd,
+                                                                                                    num_epochs,
+                                                                                                    batch_size,
+                                                                                                    num_workers,
+                                                                                                    num_classes,
+                                                                                                    sizes,
+                                                                                                    sum_sizes,
+                                                                                                    rare_acc,
+                                                                                                    all_acc,
+                                                                                                    class_dict,
+                                                                                                    device)
+    
+    df = dmgt_df(rare_acc, all_acc, sizes, sum_sizes, init_pts, imbals, taus, trials, num_sel_rnds)                         
+    
+    return df
 
+######## Helper Functions ########
+
+# warm-start train DMGT and RAND models
 def train_init_model(test_embeds_loader,
                      num_init_pts,
                      imbal,
@@ -175,17 +170,16 @@ def train_init_model(test_embeds_loader,
     model = train(device, num_epochs, init_loader, model)
 
     rare_acc[:,:,:,:,0] = (
-
             torch.cat((calc_acc(model, test_embeds_loader, num_classes)[0],
                        calc_acc(model, test_embeds_loader, num_classes)[0])))
 
     all_acc[:,:,:,:,0] = (
-
             torch.cat((calc_acc(model, test_embeds_loader, num_classes)[1],
                        calc_acc(model, test_embeds_loader, num_classes)[1])))
 
     return model, stream_dataset, sizes, sum_sizes, rare_acc, all_acc
 
+# update models on selected points after each batch
 def update_models(DMGT_model,
                   RAND_model,
                   rare_val_embeds_loader,
@@ -216,12 +210,10 @@ def update_models(DMGT_model,
     DMGT_x, DMGT_y, RAND_x, RAND_y = get_subsets(stream_x, stream_y, tau, DMGT_model, num_classes, rare_isoreg, common_isoreg, device)
 
     sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
-            
             torch.stack((torch.tensor([(DMGT_y==i).sum() for i in range(num_classes)]),
                          torch.tensor([(RAND_y==i).sum() for i in range(num_classes)]))))
     
     sum_sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
-
             torch.tensor([sum_sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd] + len(DMGT_y)]))
         
     DMGT_model = train(device,
@@ -235,12 +227,10 @@ def update_models(DMGT_model,
                        RAND_model)
     
     rare_acc[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
-
             torch.cat((calc_acc(DMGT_model, test_embeds_loader, num_classes)[0], 
                        calc_acc(RAND_model, test_embeds_loader, num_classes)[0])))
     
     all_acc[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
-            
             torch.cat((calc_acc(DMGT_model, test_embeds_loader, num_classes)[1],
                        calc_acc(RAND_model, test_embeds_loader, num_classes)[1])))
 

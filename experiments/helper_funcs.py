@@ -1,7 +1,9 @@
+# import libraries
 import numpy as np
 import torch
 from torch import nn
 
+# value function -- class cardinality
 def class_card(prev_labels, x, num_classes, DMGT_model, rare_isoreg, common_isoreg, device):
     
     DMGT_model.eval()
@@ -24,6 +26,7 @@ def class_card(prev_labels, x, num_classes, DMGT_model, rare_isoreg, common_isor
     
     return sum([softmax[i] * (np.sqrt(label_counts[i] + 1) - np.sqrt(label_counts[i])) for i in range(num_classes)]) 
 
+# selects subsets from stream under DMGT
 def get_subsets(stream_x, stream_y, tau, DMGT_model, num_classes, rare_isoreg, common_isoreg, device):
     
     DMGT_x = stream_x[0].unsqueeze(0)

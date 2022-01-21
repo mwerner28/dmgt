@@ -1,3 +1,4 @@
+# import libraries
 import numpy as np
 from numpy import genfromtxt
 import random
@@ -7,13 +8,16 @@ from torchvision.models import resnet50
 import pandas as pd
 from os.path import exists as file_exists
 import argparse
+# import helper functions
 from ../helper_funcs import class_card, get_subsets
 from ../model_funcs import Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
-from ../data_funcs/imnet import get_embed_loader, get_embeds, get_test_embed_loader, get_test_loader
+from ../data_funcs/imnet import get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
+from make_dataframe import fed_dmgt_df
 
+# main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(num_init_pts,
                imbals,
-               cost,
+               costs,
                trials,
                num_algs,
                num_agents,
@@ -30,14 +34,8 @@ def experiment(num_init_pts,
                folder_to_class_file,
                test_label_file,
                weights_path,
-               embeds_path,
-               embeds_labels_path,
-               idx_conv_dict_path,
-               test_embeds_path,
-               test_embeds_labels_path,
                device,
-               num_sel_rnds):
-    
+               num_sel_rnds):    
         
     rare_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
     all_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
@@ -58,26 +56,20 @@ def experiment(num_init_pts,
                                                num_classes,
                                                num_workers,
                                                weights_path,
-                                               embeds_path,
-                                               embeds_labels_path,
-                                               idx_conv_dict_path,
                                                folder_to_class_file,
                                                device)
     
-    test_embeds_loader, rare_val_embeds_loader, common_val_embeds_loader, val_embeds_loader = get_test_embed_loader(embed_dim,
-                                                                                                                    embed_batch_size,
-                                                                                                                    batch_size,
-                                                                                                                    num_classes,
-                                                                                                                    num_workers,
-                                                                                                                    weights_path,
-                                                                                                                    test_dir,
-                                                                                                                    test_embeds_path,
-                                                                                                                    test_embeds_labels_path,
-                                                                                                                    test_label_file,
-                                                                                                                    class_dict,
-                                                                                                                    num_test_pts,
-                                                                                                                    idx_conv_dict,
-                                                                                                                    device)
+    test_embeds_loader, rare_val_embeds_loader, common_val_embeds_loader, val_embeds_loader = get_test_embed_loaders(embed_dim,
+                                                                                                                     embed_batch_size,
+                                                                                                                     batch_size,
+                                                                                                                     num_classes,
+                                                                                                                     num_workers,
+                                                                                                                     weights_path,
+                                                                                                                     test_dir,
+                                                                                                                     test_label_file,
+                                                                                                                     class_dict,
+                                                                                                                     num_test_pts,
+                                                                                                                     device)
 
     init_x = torch.empty(0)
     init_y = torch.empty(0)
@@ -135,6 +127,8 @@ def experiment(num_init_pts,
             RAND_y = torch.empty(0)
 
             for agent in range(num_agents):
+                cost = costs[agent]
+
                 _, (agent_stream_x, agent_stream_y) = next(stream_samples_dict[agent])
                 agent_FED_DMGT_x, agent_FED_DMGT_y, agent_RAND_x, agent_RAND_y = get_subsets(agent_stream_x,
                                                                                              agent_stream_y,
@@ -179,16 +173,8 @@ def experiment(num_init_pts,
             all_acc[trial,sel_rnd+1] = (
                     torch.cat((calc_acc(FED_DMGT_model, test_embeds_loader, num_classes)[1],
                                calc_acc(RAND_model, test_embeds_loader, num_classes)[1])))
-        
-    return rare_acc, all_acc, sizes, sum_sizes
-
-### Helper Function
-def get_base_model(weights_path, num_classes, device):
     
-    model = resnet50(pretrained=False).to(device)
-    checkpoint = torch.load(weights_path, map_location=device)
-    state_dict = checkpoint['state_dict']
-    model.load_state_dict(state_dict, strict=False)
+    df = fed_dmgt_df(rare_acc, all_acc, sizes, sum_sizes, trials, num_sel_rnds)
     
-    return model
+    return df
 

@@ -1,3 +1,4 @@
+# import libraries
 import numpy as np
 from numpy import genfromtxt
 import torch 
@@ -6,8 +7,10 @@ from torchvision.datasets import ImageNet, ImageFolder
 from torchvision.transforms import Compose, ToTensor, Normalize, Resize
 from torchvision.models import resnet50
 import os
+# import Embed model (wrapper around resnet that returns penultimate embedding layer)
 from model_funcs import Embed
 
+# constructs dataloader for simclr embeddings of imagenet
 def get_embed_loader(data_dir,
                      class_dict,
                      num_classes,
@@ -46,6 +49,7 @@ def get_embed_loader(data_dir,
 
     return embed_loader, num_pts, idx_conv_dict
 
+# constructs imbalanced data stream
 def get_datasets(embeds, labels, num_init_pts, imbal, num_classes):
     
     rare_idxs = (labels < 5).nonzero().squeeze()
@@ -64,6 +68,7 @@ def get_datasets(embeds, labels, num_init_pts, imbal, num_classes):
 
     return init_dataset, stream_dataset
 
+# gets embeddings of data
 def get_embeds(data_dir,
                class_dict,
                embed_dim,
@@ -71,87 +76,62 @@ def get_embeds(data_dir,
                num_classes,
                num_workers,
                weights_path,
-               embeds_path,
-               embeds_labels_path,
-               idx_conv_dict_path,
                folder_to_class_file,
                device):
     
-    if not (file_exists(embeds_path) and
-            file_exists(embeds_labels_path) and
-            file_exists(idx_conv_dict_path)):
-        
-        embed_loader, num_pts, idx_conv_dict = get_embed_loader(data_dir, class_dict, num_classes, embed_batch_size, num_workers, folder_to_class_file)
+    embed_loader, num_pts, idx_conv_dict = get_embed_loader(data_dir, class_dict, num_classes, embed_batch_size, num_workers, folder_to_class_file)
 
-        pretrained_model = get_base_model(weights_path, num_classes,device)
+    pretrained_model = get_base_model(weights_path, num_classes,device)
+
+    embed_model = Embed(pretrained_model)    
+    embed_model.eval()
+    embeds = torch.zeros([num_pts, embed_dim])
+    embeds_labels = torch.zeros([num_pts])
     
-        embed_model = Embed(pretrained_model)    
-        embed_model.eval()
-        embeds = torch.zeros([num_pts, embed_dim])
-        embeds_labels = torch.zeros([num_pts])
+    with torch.no_grad():
+        for idx, (data, targets) in enumerate(embed_loader):
+            data = data.to(device)
+            targets = torch.tensor([class_dict[y.item()] for y in targets]) 
+            embeds[idx*embed_batch_size: min(num_pts, (idx+1)*embed_batch_size)] = embed_model(data).squeeze()
+            embeds_labels[idx*embed_batch_size: min(num_pts, (idx+1)*embed_batch_size)] = targets
         
-        with torch.no_grad():
-            for idx, (data, targets) in enumerate(embed_loader):
-                data = data.to(device)
-                targets = torch.tensor([class_dict[y.item()] for y in targets]) 
-                embeds[idx*embed_batch_size: min(num_pts, (idx+1)*embed_batch_size)] = embed_model(data).squeeze()
-                embeds_labels[idx*embed_batch_size: min(num_pts, (idx+1)*embed_batch_size)] = targets
-        
-        torch.save(embeds, embeds_path)
-        torch.save(embeds_labels, embeds_labels_path)
-        torch.save(idx_conv_dict, idx_conv_dict_path)
-    
-    embeds = torch.load(embeds_path)
-    embeds_labels = torch.load(embeds_labels_path)
-    idx_conv_dict = torch.load(idx_conv_dict_path)
-    
     return embeds, embeds_labels, idx_conv_dict
 
-def get_test_embed_loader(embed_dim,
-                          embed_batch_size,
-                          batch_size,
-                          num_classes,
-                          num_workers,
-                          weights_path,
-                          test_dir,
-                          test_embeds_path,
-                          test_embeds_labels_path,
-                          test_label_file,
-                          class_dict,
-                          num_test_pts,
-                          idx_conv_dict,
-                          device):
+#  constructs dataloaders for test and validation embeddings
+def get_test_embed_loaders(embed_dim,
+                           embed_batch_size,
+                           batch_size,
+                           num_classes,
+                           num_workers,
+                           weights_path,
+                           test_dir,
+                           test_label_file,
+                           class_dict,
+                           num_test_pts,
+                           idx_conv_dict,
+                           device):
     
-    if not (file_exists(test_embeds_path) and
-            file_exists(test_embeds_labels_path)):
-        
-        test_loader = get_test_loader(test_dir, test_label_file, idx_conv_dict, batch_size, num_workers, class_dict)
-        
-        pretrained_model = get_base_model(weights_path, num_classes, device)
-        
-        embed_model = Embed(pretrained_model)
-        
-        embed_model.eval()
-        
-        test_embeds = torch.zeros([num_test_pts, embed_dim])
-        test_embeds_labels = torch.zeros([num_test_pts])
-        
-        inv_dict = {idx_conv_dict[k]:k for k in idx_conv_dict}
-        
-        with torch.no_grad():
-            for idx, (data, targets) in enumerate(test_loader):
-                data = data.to(device)
+    test_loader = get_test_loader(test_dir, test_label_file, idx_conv_dict, batch_size, num_workers, class_dict)
+    
+    pretrained_model = get_base_model(weights_path, num_classes, device)
+    
+    embed_model = Embed(pretrained_model)
+    
+    embed_model.eval()
+    
+    test_embeds = torch.zeros([num_test_pts, embed_dim])
+    test_embeds_labels = torch.zeros([num_test_pts])
+    
+    inv_dict = {idx_conv_dict[k]:k for k in idx_conv_dict}
+    
+    with torch.no_grad():
+        for idx, (data, targets) in enumerate(test_loader):
+            data = data.to(device)
 
-                targets = torch.tensor([class_dict[inv_dict[y.item()]] for y in targets]) 
-                test_embeds[idx*embed_batch_size: min(num_test_pts, (idx+1)*embed_batch_size)] = embed_model(data).squeeze()
-                test_embeds_labels[idx*embed_batch_size: min(num_test_pts, (idx+1)*embed_batch_size)] = targets
+            targets = torch.tensor([class_dict[inv_dict[y.item()]] for y in targets]) 
+            test_embeds[idx*embed_batch_size: min(num_test_pts, (idx+1)*embed_batch_size)] = embed_model(data).squeeze()
+            test_embeds_labels[idx*embed_batch_size: min(num_test_pts, (idx+1)*embed_batch_size)] = targets
         
-        torch.save(test_embeds, test_embeds_path)
-        torch.save(test_embeds_labels, test_embeds_labels_path)
-    
-    test_embeds = torch.load(test_embeds_path)
-    test_embeds_labels = torch.load(test_embeds_labels_path)
-    
     rare_embeds_idxs = (test_embeds_labels < num_classes/2).nonzero().squeeze(1)
     common_embeds_idxs = (test_embeds_labels >= num_classes/2).nonzero().squeeze(1)
     
@@ -185,6 +165,7 @@ def get_test_embed_loader(embed_dim,
     
     return test_embeds_loader, rare_val_embeds_loader, common_val_embeds_loader, val_embeds_loader
 
+# helper fucntion for get_test_embed_loaders -- constructs dataloader for imagenet val
 def get_test_loader(test_dir, test_label_file, idx_conv_dict, batch_size, num_workers, class_dict):
 
     data_transform = Compose([Resize((224, 224)), ToTensor()])
@@ -202,8 +183,7 @@ def get_test_loader(test_dir, test_label_file, idx_conv_dict, batch_size, num_wo
 
     return test_loader
 
-## Helper function to create symbolic links from ImageNet to another directory
-
+# helper function -- constructs resnet50 trained on simclr embeddings 
 def get_base_model(weights_path, num_classes, device):
     
     model = resnet50(pretrained=False).to(device)
@@ -212,11 +192,4 @@ def get_base_model(weights_path, num_classes, device):
     model.load_state_dict(state_dict, strict=False)
     
     return model
-
-def extract_data(orig_dir, data_dir):
-    for root, dirs, _ in os.walk(orig_dir):
-        for name in dirs:
-            if name.startswith('n'):
-                os.symlink(os.path.join(root, name), os.path.join(data_dir, name))
-
 

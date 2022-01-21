@@ -1,8 +1,10 @@
+# import libraries
 import torch
 from torch.utils.data import DataLoader, TensorDataset, Subset, random_split
 from torchvision.transforms import Compose, ToTensor, Normalize, Resize
 from torchvision.datasets import MNIST
 
+# constructs imbalanced data stream
 def get_datasets(num_init_pts, imbal, num_classes):
 
     data_transform = Compose([Resize((224, 224)), ToTensor(), Normalize((0.1307,), (0.3081,))])
@@ -25,6 +27,7 @@ def get_datasets(num_init_pts, imbal, num_classes):
     
     return init_dataset, stream_dataset
 
+# constructs dataloaders for test data (to calculate model accuracy) and val data (to train isotonic regressor)
 def get_val_loaders(num_test_pts, batch_size, num_workers, num_classes):
 
     transform = Compose([Resize((224, 224)), ToTensor(), Normalize((0.1307,), (0.3081,))])

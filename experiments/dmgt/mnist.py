@@ -1,10 +1,14 @@
+# import libraries
 import numpy as np
 import torch 
 from torch.utils.data import DataLoader, TensorDataset
+# import helper functions 
 from ../helper_funcs import class_card, get_subsets
 from ../model_funcs import MnistResNet, train, load_model, calc_acc, train_isoreg
 from ../data_funcs/mnist import get_datasets, get_val_loaders
+from make_dataframe import dmgt_df
 
+# main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(init_pts,
                imbals,
                taus,
@@ -77,9 +81,11 @@ def experiment(init_pts,
                                                                                                     all_acc,
                                                                                                     device)
         
-    return rare_acc, all_acc, sizes, sum_sizes
+    df = dmgt_df(rare_acc, all_acc, sizes, sum_sizes, init_pts, imbals, taus, trials, num_sel_rnds)
+    
+    return df
 
-######## Helper Functions #########
+######## Helper Functions ########
 
 # warm-start train DMGT and RAND models
 def train_init_model(test_loader,

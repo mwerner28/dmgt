@@ -1,9 +1,10 @@
+# import libraries
 import torch 
 from torch import nn, optim
 from torchvision.models.resnet import ResNet, Bottleneck
 from sklearn.isotonic import IsotonicRegression
 
-# modify resnet50 to take in single-channel MNIST images and output 10 classes
+# modifies resnet50 to accept single-channel images and output 10 classes (for mnist experiment)
 class MnistResNet(ResNet):
     def __init__(self):
         super(MnistResNet, self).__init__(Bottleneck, [3, 4, 6, 3], num_classes=10)
@@ -12,6 +13,7 @@ class MnistResNet(ResNet):
             stride=2, 
             padding=3, bias=False)
 
+# wrapper for resnet (in imagenet experiment, accepts image and outputs penultimate embedding layer instead of softmax scores)
 class Embed(nn.Module):
     def __init__(self, model):
         super(Embed, self).__init__()
@@ -21,6 +23,7 @@ class Embed(nn.Module):
         x = self.embed(x)
         return x
 
+# logistic regression model (in imagenet experiment, accepts embedding vector and softmax vector)
 class LogRegModel(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(LogRegModel, self).__init__()
@@ -30,6 +33,7 @@ class LogRegModel(nn.Module):
         x = self.linear(x)
         return x
 
+# deep copies input model
 def load_model(model, device, *args):
     
     if len(args) > 0:
@@ -42,6 +46,7 @@ def load_model(model, device, *args):
     model_copy = model_copy.to(device)
     return model_copy
 
+# trains model
 def train(device, num_epochs, train_loader, model):
    
     model = model.to(device)
@@ -76,7 +81,7 @@ def train(device, num_epochs, train_loader, model):
 
     return model
 
-# helper function for deep-copying model
+# calculates prediction accuracy of input model on all and rare classes of test data
 def calc_acc(model, test_loader, num_classes):
 
     model.eval()
@@ -99,6 +104,7 @@ def calc_acc(model, test_loader, num_classes):
 
     return rare_acc.float().mean().unsqueeze(0), all_acc.float().mean().unsqueeze(0)
 
+# trains isotonic regressor from input model's top-score prediction on validation data to 0-1 indicator of correc prediction
 def train_isoreg(model, val_loader):
     model.eval()
 
