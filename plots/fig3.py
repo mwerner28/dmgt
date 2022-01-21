@@ -1,9 +1,11 @@
+# import libraries
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
 import argparse
+# import dataframes from main experiment on mnist and imagenet
 from ../experiments/dmgt/run_exp import mnist_df, imnet_df
 
 def plot_figure3(df,

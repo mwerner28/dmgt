@@ -1,3 +1,4 @@
+# import libraries
 import numpy as np
 import sympy
 from sympy.solvers import solve 
@@ -6,7 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
 import argparse
-from ../experiments/run_exp import imnet_dmgt_df
+# import dataframe from main experiment on imagenet
+from ../experiments/dmgt/run_exp import imnet_df
 
 def plot_figure2(df,
                  num_init_pts,
@@ -78,7 +80,7 @@ if __name__=='main':
     save_dir = SAVE PLOTS HERE
 
     # figure 2
-    plot_figure2(imnet_dmgt_df,
+    plot_figure2(imnet_df,
                  args.num_init_pts,
                  args.imbal,
                  args.taus,
