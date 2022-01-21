@@ -12,8 +12,6 @@ parser.add_argument('--imbals', nargs='+', type=int, default=[2,5,10])
 parser.add_argument('--taus', type=float, default=[0.1,0.1,0.1])
 parser.add_argument('--num_agents', type=int, default=3)
 parser.add_argument('--trials', nargs='+', type=int, default=np.arange(5))
-parser.add_argument('--mnist_num_sel_rnds', type=int, default=10)
-parser.add_argument('--imnet_num_sel_rnds', type=int, default=6)
 parser.add_argument('--num_algs', type=int, default=2)
 parser.add_argument('--stream_size', type=int, default=1000)
 parser.add_argument('--num_test_pts', type=int, default=5000)
@@ -24,10 +22,12 @@ parser.add_argument('--num_classes', type=int, default=10)
 parser.add_argument('--seed', type=int, default=0)
 
 # extra mnist paramaters
+parser.add_argument('--mnist_num_sel_rnds', type=int, default=10)
 parser.add_argument('--mnist_train_dir', type=str, default='path/to/mnist/train/')
 parser.add_argument('--mnist_val_dir', type=str, default='path/to/mnist/val/')
 
 # extra imagenet parameters
+parser.add_argument('--imnet_num_sel_rnds', type=int, default=6)
 parser.add_argument('--imnet_embed_dim', type=int, default=2048)
 parser.add_argument('--imnet_train_dir', type=str, default='path/to/imagenet/train/')
 parser.add_argument('--imnet_val_dir', type=str, default='path/to/imagenet/val/')
