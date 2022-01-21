@@ -7,10 +7,33 @@
    viewBox="0 0 175.26002 81.280001"
    version="1.1"
    id="svg5"
+   sodipodi:docname="figure1.svg"
+   inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:ns1="http://www.iki.fi/pav/software/textext/">
+  <sodipodi:namedview
+     id="namedview1047"
+     pagecolor="#ffffff"
+     bordercolor="#cccccc"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="1"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="in"
+     showgrid="false"
+     inkscape:zoom="1.7013889"
+     inkscape:cx="327.08571"
+     inkscape:cy="140.47347"
+     inkscape:window-width="1296"
+     inkscape:window-height="768"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
   <defs
      id="defs2">
     <linearGradient
@@ -196,13 +219,13 @@
     <text
        xml:space="preserve"
        style="font-size:2.82222px;line-height:1.25;font-family:sans-serif;stroke-width:0.264583"
-       x="-43.911636"
+       x="-43.382469"
        y="4.1837277"
        id="text49423"
        transform="rotate(-90)"><tspan
          id="tspan49421"
          style="font-size:2.82222px;stroke-width:0.264583"
-         x="-43.911636"
+         x="-43.382469"
          y="4.1837277">lizard</tspan></text>
     <text
        xml:space="preserve"
@@ -239,17 +262,17 @@
          style="font-size:3.52778px;stroke-width:0.264583"
          x="143.72855"
          y="13.268476"
-         id="tspan154776">      subset</tspan></text>
+         id="tspan154776">       subset</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:4.23333px;line-height:1.25;font-family:sans-serif;stroke-width:0.264583"
-       x="122.95353"
+       x="120.83688"
        y="44.322678"
        id="text64619"><tspan
          id="tspan64617"
          style="font-size:4.23333px;stroke-width:0.264583"
-         x="122.95353"
-         y="44.322678">MVT</tspan></text>
+         x="120.83688"
+         y="44.322678">DMGT</tspan></text>
     <text
        xml:space="preserve"
        transform="scale(0.26458333)"
@@ -514,7 +537,7 @@
        x="143.1107"
        y="18.487305" />
     <g
-       transform="matrix(0.352778,0,0,0.352778,60.487265,1.3864762)"
+       transform="matrix(0.352778,0,0,0.352778,59.428931,1.3864762)"
        ns1:version="1.7.0"
        ns1:texconverter="pdflatex"
        ns1:pdfconverter="inkscape"
@@ -566,7 +589,7 @@
       </g>
     </g>
     <g
-       transform="matrix(0.352778,0,0,0.352778,157.01098,1.8384469)"
+       transform="matrix(0.352778,0,0,0.352778,155.95264,1.8384469)"
        ns1:version="1.7.0"
        ns1:texconverter="pdflatex"
        ns1:pdfconverter="inkscape"
