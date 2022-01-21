@@ -27,8 +27,8 @@ parser.add_argument('--seed', type=int, default=0)
 parser.add_argument('--imnet_embed_dim', type=int, default=2048)
 parser.add_argument('--imnet_data_dir', type=str, default=STORE IMAGNET-TRAIN HERE IN THIS DIRECTORY)
 parser.add_argument('--imnet_test_dir', type=str, default=STORE IMAGENET-VAL HERE IN THIS DIRECTORY)
-parser.add_argument('--imnet_folder_to_class_file', type=str, default=STORE IMAGENET FOLDER --> CLASS IDXS IN THIS FILE)
-parser.add_argument('--imnet_test_label_file', type=str, default=STORE CLASS IDXS OF IMAGENET VAL IN THIS FILE)
+parser.add_argument('--imnet_folder_to_class_file', type=str, default='../../imagenet_datafiles/folder_to_class.txt')
+parser.add_argument('--imnet_test_label_file', type=str, default='../../imagenet_datafiles/test_classes.txt')
 parser.add_argument('--imnet_smclr_weights_path', type=str, default=STORE PRETRAINED SIMCLR RESNET50 MODEL HERE) 
 
 if __name__ == "__main__":
