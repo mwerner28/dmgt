@@ -21,5 +21,5 @@ cd experiments/dmgt (if running dmgt)
 cd experiments/fed_dmgt (if funning fed_dmgt)
 conda env create -f environment.yml
 conda activate dmgt
-python run_exp.py 'path/to/imagenet(or mnist)/train/' 'path/to/imagenet(or mnist)/test/'
+python run_exp.py 'path/to/imagenet(or mnist)/train/' 'path/to/imagenet(or mnist)/val/'
 ```
