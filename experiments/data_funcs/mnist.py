@@ -5,11 +5,11 @@ from torchvision.transforms import Compose, ToTensor, Normalize, Resize
 from torchvision.datasets import MNIST
 
 # constructs imbalanced data stream
-def get_datasets(num_init_pts, imbal, num_classes):
+def get_datasets(num_init_pts, imbal, num_classes, train_path):
 
     data_transform = Compose([Resize((224, 224)), ToTensor(), Normalize((0.1307,), (0.3081,))])
     
-    mnist_train = MNIST(download=True, train=True, root=STORE MNIST HERE, transform=data_transform)
+    mnist_train = MNIST(download=True, train=True, root=train_path, transform=data_transform)
     
     rare_idxs = (mnist_train.targets < num_classes/2).nonzero().squeeze(1)
     common_idxs = (mnist_train.targets >= num_classes/2).nonzero().squeeze(1)
@@ -28,11 +28,11 @@ def get_datasets(num_init_pts, imbal, num_classes):
     return init_dataset, stream_dataset
 
 # constructs dataloaders for test data (to calculate model accuracy) and val data (to train isotonic regressor)
-def get_val_loaders(num_test_pts, batch_size, num_workers, num_classes):
+def get_val_loaders(num_test_pts, batch_size, num_workers, num_classes, val_path):
 
     transform = Compose([Resize((224, 224)), ToTensor(), Normalize((0.1307,), (0.3081,))])
     
-    mnist_test = MNIST(download=True, train=False, root=STORE MNIST HERE, transform=transform)
+    mnist_test = MNIST(download=True, train=False, root=val_path, transform=transform)
     
     rare_idxs = (mnist_test.targets < num_classes/2).nonzero().squeeze(1)
     common_idxs = (mnist_test.targets >= num_classes/2).nonzero().squeeze(1)

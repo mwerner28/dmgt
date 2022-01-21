@@ -21,7 +21,9 @@ def experiment(init_pts,
                num_workers,
                num_classes,
                device,
-               num_sel_rnds):
+               num_sel_rnds,
+               train_path,
+               val_path):
 
     rare_acc=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,num_algs)
     all_acc=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,num_algs)
@@ -29,7 +31,7 @@ def experiment(init_pts,
     sizes=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,num_algs,num_classes)
     sum_sizes=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,1)
     
-    test_loader, rare_val_loader, common_val_loader, val_loader = get_val_loaders(num_test_pts, batch_size, num_workers, num_classes)
+    test_loader, rare_val_loader, common_val_loader, val_loader = get_val_loaders(num_test_pts, batch_size, num_workers, num_classes, val_path)
 
     for init_pts_idx,num_init_pts in enumerate(init_pts):    
         for imbal_idx,imbal in enumerate(imbals):
@@ -46,7 +48,8 @@ def experiment(init_pts,
                                                                                           sum_sizes,
                                                                                           rare_acc,
                                                                                           all_acc,
-                                                                                          device)
+                                                                                          device,
+                                                                                          train_path)
             
             for tau_idx,tau in enumerate(taus):
                 for trial in trials:
@@ -101,9 +104,10 @@ def train_init_model(test_loader,
                      sum_sizes,
                      rare_acc,
                      all_acc,
-                     device):
+                     device,
+                     train_path):
 
-    init_dataset, stream_dataset = get_datasets(num_init_pts, imbal, num_classes)
+    init_dataset, stream_dataset = get_datasets(num_init_pts, imbal, num_classes, train_path)
     init_loader = DataLoader(init_dataset, batch_size=num_init_pts, num_workers=num_workers, shuffle=True)
     init_samples = enumerate(init_loader)
     _, (init_x, init_y) = next(init_samples)

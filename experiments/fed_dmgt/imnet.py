@@ -27,15 +27,15 @@ def experiment(num_init_pts,
                batch_size,
                num_workers,
                num_classes,
+               device,
+               num_sel_rnds,
                embed_batch_size,
                embed_dim,
-               data_dir,
-               test_dir,
+               train_path,
+               val_path,
                folder_to_class_file,
                test_label_file,
-               weights_path,
-               device,
-               num_sel_rnds):    
+               weights_path)
         
     rare_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
     all_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
@@ -49,7 +49,7 @@ def experiment(num_init_pts,
     common_classes = classes[int(num_classes/2):]
     class_dict = dict(zip(rare_classes+common_classes, range(num_classes)))
 
-    embeds, labels, idx_conv_dict = get_embeds(data_dir,
+    embeds, labels, idx_conv_dict = get_embeds(train_path,
                                                class_dict,
                                                embed_dim,
                                                embed_batch_size,
@@ -65,7 +65,7 @@ def experiment(num_init_pts,
                                                                                                                      num_classes,
                                                                                                                      num_workers,
                                                                                                                      weights_path,
-                                                                                                                     test_dir,
+                                                                                                                     val_path,
                                                                                                                      test_label_file,
                                                                                                                      class_dict,
                                                                                                                      num_test_pts,

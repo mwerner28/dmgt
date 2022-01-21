@@ -11,7 +11,7 @@ import os
 from model_funcs import Embed
 
 # constructs dataloader for simclr embeddings of imagenet
-def get_embed_loader(data_dir,
+def get_embed_loader(train_path,
                      class_dict,
                      num_classes,
                      embed_batch_size,
@@ -19,7 +19,7 @@ def get_embed_loader(data_dir,
                      folder_to_class_file):
 
     data_transform = Compose([Resize((224, 224)), ToTensor()])
-    dataset = ImageFolder(root=data_dir, transform=data_transform)
+    dataset = ImageFolder(root=train_path, transform=data_transform)
     
     with open(folder_to_class_file) as f:
         lines = list(zip(*[tuple(line.rstrip().split(' '))[:-1] for line in f]))
@@ -69,7 +69,7 @@ def get_datasets(embeds, labels, num_init_pts, imbal, num_classes):
     return init_dataset, stream_dataset
 
 # gets embeddings of data
-def get_embeds(data_dir,
+def get_embeds(train_path,
                class_dict,
                embed_dim,
                embed_batch_size,
@@ -79,7 +79,7 @@ def get_embeds(data_dir,
                folder_to_class_file,
                device):
     
-    embed_loader, num_pts, idx_conv_dict = get_embed_loader(data_dir, class_dict, num_classes, embed_batch_size, num_workers, folder_to_class_file)
+    embed_loader, num_pts, idx_conv_dict = get_embed_loader(train_path, class_dict, num_classes, embed_batch_size, num_workers, folder_to_class_file)
 
     pretrained_model = get_base_model(weights_path, num_classes,device)
 
@@ -104,14 +104,14 @@ def get_test_embed_loaders(embed_dim,
                            num_classes,
                            num_workers,
                            weights_path,
-                           test_dir,
+                           val_path,
                            test_label_file,
                            class_dict,
                            num_test_pts,
                            idx_conv_dict,
                            device):
     
-    test_loader = get_test_loader(test_dir, test_label_file, idx_conv_dict, batch_size, num_workers, class_dict)
+    test_loader = get_test_loader(val_path, test_label_file, idx_conv_dict, batch_size, num_workers, class_dict)
     
     pretrained_model = get_base_model(weights_path, num_classes, device)
     
@@ -166,13 +166,13 @@ def get_test_embed_loaders(embed_dim,
     return test_embeds_loader, rare_val_embeds_loader, common_val_embeds_loader, val_embeds_loader
 
 # helper fucntion for get_test_embed_loaders -- constructs dataloader for imagenet val
-def get_test_loader(test_dir, test_label_file, idx_conv_dict, batch_size, num_workers, class_dict):
+def get_test_loader(val_path, test_label_file, idx_conv_dict, batch_size, num_workers, class_dict):
 
     data_transform = Compose([Resize((224, 224)), ToTensor()])
     
     labels = [int(y) for y in genfromtxt(test_label_file)]
     
-    test_dataset = ImageFolder(test_dir, transform=data_transform)
+    test_dataset = ImageFolder(val_path, transform=data_transform)
     test_dataset.samples = list(map(lambda x, y: (x[0], y), test_dataset.samples, labels))
     test_dataset.targets = labels
     

@@ -23,14 +23,18 @@ parser.add_argument('--num_workers', type=int, default=10)
 parser.add_argument('--num_classes', type=int, default=10)
 parser.add_argument('--seed', type=int, default=0)
 
-# extra imagenet parmaeters
+# extra mnist paramaters
+parser.add_argument('--mnist_train_dir', type=str, default='path/to/mnist/train/')
+parser.add_argument('--mnist_val_dir', type=str, default='path/to/mnist/val/')
+
+# extra imagenet parameters
 parser.add_argument('--imnet_embed_dim', type=int, default=2048)
-parser.add_argument('--imnet_data_dir', type=str, default=STORE IMAGNET-TRAIN HERE IN THIS DIRECTORY)
-parser.add_argument('--imnet_test_dir', type=str, default=STORE IMAGENET-VAL HERE IN THIS DIRECTORY)
+parser.add_argument('--imnet_train_dir', type=str, default='path/to/imagenet/train/')
+parser.add_argument('--imnet_val_dir', type=str, default='path/to/imagenet/val/')
 parser.add_argument('--imnet_folder_to_class_file', type=str, default='../../imagenet_datafiles/folder_to_class.txt')
 parser.add_argument('--imnet_test_label_file', type=str, default='../../imagenet_datafiles/test_classes.txt')
-# can find simclr resnet50 model here: https://github.com/tonylins/simclr-converter -- we use ResNet-50(1x)
-parser.add_argument('--imnet_smclr_weights_path', type=str, default=STORE PRETRAINED SIMCLR RESNET50 MODEL HERE) 
+# can find simclr resnet50 model for pytorch here: https://github.com/tonylins/simclr-converter -- we use ResNet-50(1x)
+parser.add_argument('--imnet_smclr_weights_path', type=str, default='path/to/simclr_resnet50/model') 
 
 if __name__ == "__main__":
     
@@ -59,18 +63,22 @@ if __name__ == "__main__":
                   args.num_classes,
                   device]
     
-    extra_imnet_args = [args.imnet_embed_batch_size,
-                        args.imnet_embed_dim,
-                        args.imnet_data_dir,
-                        args.imnet_test_dir,
-                        args.imnet_folder_to_class_file,
-                        args.imnet_test_label_file,
-                        args.imnet_smclr_weights_path]
+    mnist_args = [args.mnist_num_sel_rnds,
+                  args.mnist_train_dir,
+                  args.mnist_val_dir]
 
+    imnet_args = [args.imnet_num_sel_rnds,
+                  args.imnet_embed_batch_size,
+                  args.imnet_embed_dim,
+                  args.imnet_train_dir,
+                  args.imnet_val_dir,
+                  args.imnet_folder_to_class_file,
+                  args.imnet_test_label_file,
+                  args.imnet_smclr_weights_path]
 
     # generate dataframes from main experiment
-    mnist_df = mnist_exp(*input_args, args.mnist_num_sel_rnds)
+    mnist_df = mnist_exp(*input_args, *mnist_args)
     
-    imnet_df = imnet_exp(*input_args, *extra_imnet_args, args.imnet_num_sel_rnds)
+    imnet_df = imnet_exp(*input_args, *imnet_args)
     
     return mnist_df, imnet_df

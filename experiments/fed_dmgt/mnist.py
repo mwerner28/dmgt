@@ -27,7 +27,9 @@ def experiment(num_init_pts,
                num_workers,
                num_classes,
                device,
-               num_sel_rnds):
+               num_sel_rnds,
+               train_path,
+               val_path):
         
     rare_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
     all_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
@@ -35,7 +37,7 @@ def experiment(num_init_pts,
     sizes=torch.zeros(len(trials),num_sel_rnds+1,num_algs,num_classes)
     sum_sizes=torch.zeros(len(trials),num_sel_rnds+1,1)
     
-    test_loader, rare_val_loader, common_val_loader, val_loader = get_val_loaders(num_test_pts, batch_size, num_workers, num_classes)
+    test_loader, rare_val_loader, common_val_loader, val_loader = get_val_loaders(num_test_pts, batch_size, num_workers, num_classes, val_path)
     
     init_x = torch.empty(0)
     init_y = torch.empty(0)
@@ -43,7 +45,7 @@ def experiment(num_init_pts,
     stream_datasets_dict = {key: None for key in range(num_agents)}
     
     for agent in range(num_agents):
-        agent_init_dataset, agent_stream_dataset = get_datasets(num_init_pts, imbals[agent], num_classes)
+        agent_init_dataset, agent_stream_dataset = get_datasets(num_init_pts, imbals[agent], num_classes, train_path)
         agent_init_loader = DataLoader(agent_init_dataset, batch_size=num_init_pts, num_workers=num_workers, shuffle=True)
 
         agent_init_samples = enumerate(agent_init_loader)
