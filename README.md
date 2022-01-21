@@ -4,4 +4,5 @@ Given any stream of data, any assessment of its value, and any formulation of it
 <p align="center">
   <img src="plots/outputs/figure1.svg">
 </p>
+
 ## Usage
