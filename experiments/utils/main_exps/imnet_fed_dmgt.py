@@ -8,11 +8,10 @@ from torchvision.models import resnet50
 import pandas as pd
 from os.path import exists as file_exists
 import argparse
-# import helper functions
-from ../helper_funcs import class_card, get_subsets
-from ../model_funcs import Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
-from ../data_funcs/imnet import get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
-from make_dataframe import fed_dmgt_df
+# import internal functions
+from ..exp_utils import class_card, get_subsets, Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
+from ..data_utils/imnet_data_utils import get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
+from ..dataframes import fed_dmgt_df
 
 # main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(num_init_pts,
@@ -28,11 +27,11 @@ def experiment(num_init_pts,
                num_workers,
                num_classes,
                device,
+               train_path,
+               val_path,
                num_sel_rnds,
                embed_batch_size,
                embed_dim,
-               train_path,
-               val_path,
                folder_to_class_file,
                test_label_file,
                weights_path)

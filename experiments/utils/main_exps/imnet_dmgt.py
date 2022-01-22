@@ -1,13 +1,12 @@
 # import libraries
-import numpy as 
+import numpy as np 
 import random
 import torch 
 from torch.utils.data import DataLoader, TensorDataset
-# import helper functions
-from ../helper_funcs import class_card, get_subsets
-from ../model_funcs import Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
-from ../data_funcs/imnet import get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
-from make_dataframe import dmgt_df
+# import internal functions
+from ..exp_utils import class_card, get_subsets, Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
+from ..data_utils.imnet_data_utils import get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
+from ..dataframes import dmgt_df
 
 # main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(init_pts,
@@ -22,11 +21,11 @@ def experiment(init_pts,
                num_workers,
                num_classes,
                device,
+               train_path,
+               val_path,
                num_sel_rnds,
                embed_batch_size,
                embed_dim,
-               train_path,
-               val_path,
                folder_to_class_file,
                test_label_file,
                weights_path):
@@ -128,9 +127,9 @@ def experiment(init_pts,
     
     return df
 
-######## Helper Functions ########
+######## Internal Functions ########
 
-# warm-start train DMGT and RAND models
+# warm-start trains DMGT and RAND models
 def train_init_model(test_embeds_loader,
                      num_init_pts,
                      imbal,
@@ -179,7 +178,7 @@ def train_init_model(test_embeds_loader,
 
     return model, stream_dataset, sizes, sum_sizes, rare_acc, all_acc
 
-# update models on selected points after each batch
+# updates models on DMGT-selected points after each batch
 def update_models(DMGT_model,
                   RAND_model,
                   rare_val_embeds_loader,

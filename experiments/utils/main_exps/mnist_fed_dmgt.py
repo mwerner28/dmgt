@@ -7,11 +7,10 @@ import pandas as pd
 import os
 from os.path import exists as file_exists
 import argparse
-# import helper functions
-from ../helper_funcs import class_card, get_subsets
-from ../model_funcs import MnistResNet, train, load_model, calc_acc, train_isoreg
-from ../data_funcs/mnist import get_datasets, get_val_loaders
-from make_dataframe import fed_dmgt_df
+# import internal functions
+from ..exp_utils import class_card, get_subsets, MnistResNet, train, load_model, calc_acc, train_isoreg
+from ..data_utils.mnist_data_utils import get_datasets, get_val_loaders
+from ..dataframes import fed_dmgt_df
 
 # main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(num_init_pts,
@@ -27,9 +26,8 @@ def experiment(num_init_pts,
                num_workers,
                num_classes,
                device,
-               num_sel_rnds,
-               train_path,
-               val_path):
+               data_path,
+               num_sel_rnds):
         
     rare_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
     all_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
@@ -37,7 +35,7 @@ def experiment(num_init_pts,
     sizes=torch.zeros(len(trials),num_sel_rnds+1,num_algs,num_classes)
     sum_sizes=torch.zeros(len(trials),num_sel_rnds+1,1)
     
-    test_loader, rare_val_loader, common_val_loader, val_loader = get_val_loaders(num_test_pts, batch_size, num_workers, num_classes, val_path)
+    test_loader, rare_val_loader, common_val_loader, val_loader = get_val_loaders(num_test_pts, batch_size, num_workers, num_classes, data_path)
     
     init_x = torch.empty(0)
     init_y = torch.empty(0)
@@ -45,7 +43,7 @@ def experiment(num_init_pts,
     stream_datasets_dict = {key: None for key in range(num_agents)}
     
     for agent in range(num_agents):
-        agent_init_dataset, agent_stream_dataset = get_datasets(num_init_pts, imbals[agent], num_classes, train_path)
+        agent_init_dataset, agent_stream_dataset = get_datasets(num_init_pts, imbals[agent], num_classes, data_path)
         agent_init_loader = DataLoader(agent_init_dataset, batch_size=num_init_pts, num_workers=num_workers, shuffle=True)
 
         agent_init_samples = enumerate(agent_init_loader)

@@ -2,11 +2,10 @@
 import numpy as np
 import torch 
 from torch.utils.data import DataLoader, TensorDataset
-# import helper functions 
-from ../helper_funcs import class_card, get_subsets
-from ../model_funcs import MnistResNet, train, load_model, calc_acc, train_isoreg
-from ../data_funcs/mnist import get_datasets, get_val_loaders
-from make_dataframe import dmgt_df
+# import internal functions 
+from ..exp_utils import class_card, get_subsets, MnistResNet, train, load_model, calc_acc, train_isoreg
+from ..data_utils.mnist_data_utils import get_datasets, get_val_loaders
+from ..dataframes import dmgt_df
 
 # main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(init_pts,
@@ -21,9 +20,8 @@ def experiment(init_pts,
                num_workers,
                num_classes,
                device,
-               num_sel_rnds,
-               train_path,
-               val_path):
+               data_path,
+               num_sel_rnds):
 
     rare_acc=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,num_algs)
     all_acc=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,num_algs)
@@ -31,7 +29,7 @@ def experiment(init_pts,
     sizes=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,num_algs,num_classes)
     sum_sizes=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,1)
     
-    test_loader, rare_val_loader, common_val_loader, val_loader = get_val_loaders(num_test_pts, batch_size, num_workers, num_classes, val_path)
+    test_loader, rare_val_loader, common_val_loader, val_loader = get_val_loaders(num_test_pts, batch_size, num_workers, num_classes, data_path)
 
     for init_pts_idx,num_init_pts in enumerate(init_pts):    
         for imbal_idx,imbal in enumerate(imbals):
@@ -49,7 +47,7 @@ def experiment(init_pts,
                                                                                           rare_acc,
                                                                                           all_acc,
                                                                                           device,
-                                                                                          train_path)
+                                                                                          data_path)
             
             for tau_idx,tau in enumerate(taus):
                 for trial in trials:
@@ -88,9 +86,9 @@ def experiment(init_pts,
     
     return df
 
-######## Helper Functions ########
+######## Internal Functions ########
 
-# warm-start train DMGT and RAND models
+# warm-start trains DMGT and RAND models
 def train_init_model(test_loader,
                      num_init_pts,
                      imbal,
@@ -105,9 +103,9 @@ def train_init_model(test_loader,
                      rare_acc,
                      all_acc,
                      device,
-                     train_path):
+                     data_path):
 
-    init_dataset, stream_dataset = get_datasets(num_init_pts, imbal, num_classes, train_path)
+    init_dataset, stream_dataset = get_datasets(num_init_pts, imbal, num_classes, data_path)
     init_loader = DataLoader(init_dataset, batch_size=num_init_pts, num_workers=num_workers, shuffle=True)
     init_samples = enumerate(init_loader)
     _, (init_x, init_y) = next(init_samples)
@@ -133,7 +131,7 @@ def train_init_model(test_loader,
     
     return model, stream_dataset, sizes, sum_sizes, rare_acc, all_acc
 
-# update models on selected points after each batch
+# updates models on selected points after each batch
 def update_models(DMGT_model,
                   RAND_model,
                   rare_val_loader,

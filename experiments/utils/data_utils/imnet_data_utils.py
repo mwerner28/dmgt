@@ -8,7 +8,7 @@ from torchvision.transforms import Compose, ToTensor, Normalize, Resize
 from torchvision.models import resnet50
 import os
 # import Embed model (wrapper around resnet that returns penultimate embedding layer)
-from model_funcs import Embed
+from ..exp_utils import Embed
 
 # constructs dataloader for simclr embeddings of imagenet
 def get_embed_loader(train_path,
