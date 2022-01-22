@@ -165,7 +165,7 @@ def get_test_embed_loaders(embed_dim,
     
     return test_embeds_loader, rare_val_embeds_loader, common_val_embeds_loader, val_embeds_loader
 
-# internal function for get_test_embed_loaders -- constructs dataloader for imagenet val
+# internal function -- constructs dataloader for imagenet val
 def get_test_loader(val_path, test_label_file, idx_conv_dict, batch_size, num_workers, class_dict):
 
     data_transform = Compose([Resize((224, 224)), ToTensor()])
