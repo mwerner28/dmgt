@@ -8,7 +8,7 @@
 }
 ```
 ## Overview
-Given any stream of data, any assessment of its value, and any formulation of its selection cost, our method, DMGT, extracts the most valuable subset of the stream up to a constant factor. The procedure is simple (selecting a point if its marginal gain under the chosen value function exceeds a given threshold chosen by the analyst at that time) and memory-efficient (storing only the selected subset in memory). The figure below illustrates its performance on ImageNet for a particular example: if high value is assigned to class-balanced sets, given a class-imbalanced stream, DMGT selects a class-balanced subset of that stream. 
+Given any stream of data, any assessment of its value, and any formulation of its selection cost, our method, DMGT, extracts the most valuable subset of the stream up to a constant factor. The procedure is simple (selecting a point if its marginal gain under the chosen value function exceeds a threshold decided by the analyst at that time) and memory-efficient (storing only the selected subset in memory). The figure below illustrates an example in which high value is assigned to class-balanced sets. Given a class-imbalanced stream from ImageNet, DMGT selects a class-balanced subset of the stream. 
 <p align="center">
   <img src="plots/outputs/figure1.svg">
 </p>
