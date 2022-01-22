@@ -7,7 +7,6 @@ import argparse
 def plot_figure5(df,
                  trials,
                  sel_rnds,
-                 stream_size,
                  dataset_name,
                  fig_dir):
 
