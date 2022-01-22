@@ -1,10 +1,9 @@
-# import libraries
 import numpy as np
 import random
 import torch
 import argparse
 import sys
-# import main experiment functions
+# import internal functions
 from utils.main_exps.mnist_fed_dmgt import experiment as mnist_exp
 from utils.main_exps.imnet_fed_dmgt import experiment as imnet_exp
 sys.path.insert(0, '..')

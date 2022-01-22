@@ -1,4 +1,3 @@
-# import libraries
 import torch 
 from torch import nn, optim
 from torchvision.models.resnet import ResNet, Bottleneck

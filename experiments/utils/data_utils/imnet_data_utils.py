@@ -1,4 +1,3 @@
-# import libraries
 import numpy as np
 from numpy import genfromtxt
 import torch 
