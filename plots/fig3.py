@@ -13,7 +13,7 @@ def plot_figure3(df,
                  trials,
                  sel_rnds,
                  dataset_name,
-                 save_dir):
+                 fig_dir):
     
     fig, ax = plt.subplots()
 
@@ -86,9 +86,7 @@ def plot_figure3(df,
     
     ax.xaxis.set_major_locator(ticker.FixedLocator(sel_rnds[::round_skip]))
     ax.xaxis.set_major_formatter(ticker.FixedFormatter([f'{i}'+'\n'+f'{sizes_labels[i]}' for i in sel_rnds[::round_skip]]))
-    
     plot.set_xlabel(None)
-    
     fig.tight_layout()
-    fig.savefig(save_dir + f'{dataset_name}_accuracy.pdf')
+    fig.savefig(fig_dir + f'_{dataset_name}_accuracy.pdf')
 
