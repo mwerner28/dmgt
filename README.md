@@ -14,11 +14,11 @@ Given any stream of data, any assessment of its value, and any formulation of it
 </p>
 
 ## Usage
-You can reproduce our experiments by running the following:
+You can reproduce our experiments by running:
 ```
 git clone https://github.com/mwerner28/dmgt
 cd experiments
 conda env create -f environment.yml
 conda activate dmgt
-python run_dmgt.py --dataset_name=imagenet(or mnist) --train_path='path/to/imagenet(or mnist)/train/' --val_path='path/to/imagenet(or mnist)/val/'
+python run_dmgt.py --dataset_name='imagenet(or mnist)' --train_path='path/to/imagenet(or mnist)/train/' --val_path='path/to/imagenet(or mnist)/val/'
 ```
