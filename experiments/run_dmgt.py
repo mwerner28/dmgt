@@ -88,7 +88,7 @@ if __name__ == "__main__":
         df = mnist_exp(*input_args, *mnist_args)
         num_sel_rnds = args.mnist_num_sel_rnds
     
-    ### Plots Figures ###
+    ### Plot Figures ###
     
     fig_dir = '/save/figures/in/this/dir/'
     
