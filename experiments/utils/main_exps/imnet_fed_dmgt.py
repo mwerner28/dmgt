@@ -10,7 +10,7 @@ from os.path import exists as file_exists
 import argparse
 # import internal functions
 from ..exp_utils import class_card, get_subsets, Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
-from ..data_utils/imnet_data_utils import get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
+from ..data_utils.imnet_data_utils import get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
 from ..dataframes import fed_dmgt_df
 
 # main experiment -- runs DMGT and RAND; generates all data for figures
@@ -34,7 +34,7 @@ def experiment(num_init_pts,
                embed_dim,
                folder_to_class_file,
                test_label_file,
-               weights_path)
+               weights_path):
         
     rare_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
     all_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
