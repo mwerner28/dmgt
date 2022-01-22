@@ -3,10 +3,12 @@ import numpy as np
 import random
 import torch
 import argparse
-# import experiment functions
+import sys
+# import main experiment functions
 from utils.main_exps.mnist_fed_dmgt import experiment as mnist_exp
 from utils.main_exps.imnet_fed_dmgt import experiment as imnet_exp
-from ..plots.fig5 import plot_figure5
+sys.path.insert(0, '..')
+from plots.fig5 import plot_figure5
 
 parser = argparse.ArgumentParser()
 # experiment parameters for mnist and imagenet
@@ -54,7 +56,7 @@ if __name__ == "__main__":
     
     input_args = [args.num_init_pts,
                   args.imbals,
-                  args.tau,
+                  args.taus,
                   args.trials,
                   args.num_agents,
                   args.num_algs,
@@ -88,8 +90,8 @@ if __name__ == "__main__":
 
     ### Plot Figures ###
 
-    save_dir = '/save/figures/in/this/dir/'
+    fig_dir = SAVE PLOTS IN THIS DIRECTORY
     
     # figure 5
-    plot_figure5(df, args.trials, np.arange(num_sel_rnds), args.stream_size, args.dataset_name, save_dir)
+    plot_figure5(df, args.trials, np.arange(num_sel_rnds), args.dataset_name, fig_dir)
 
