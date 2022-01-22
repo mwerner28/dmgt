@@ -1,4 +1,3 @@
-# import libraries
 import numpy as np
 import sympy
 from sympy.solvers import solve 
