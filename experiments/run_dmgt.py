@@ -3,7 +3,7 @@ import numpy as np
 import random
 import torch
 import argparse
-# import main experiment functions
+# import experiment functions
 from utils.main_exps.mnist_dmgt import experiment as mnist_exp
 from utils.main_exps.imnet_dmgt import experiment as imnet_exp
 from ..plots.fig2 import plot_figure2
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     mnist_args = [args.train_path,
                   args.mnist_num_sel_rnds]
 
-    # generate dataframes from main experiment
+    # generates dataframes from main experiment
     if args.dataset_name=='imagenet':
         df = imnet_exp(*input_args, *imnet_args)
         num_sel_rnds = args.imnet_num_sel_rnds
@@ -87,13 +87,13 @@ if __name__ == "__main__":
         df = mnist_exp(*input_args, *mnist_args)
         num_sel_rnds = args.mnist_num_sel_rnds
     
-    ### Plot Figures ###
+    ### Plots Figures ###
     
-    #save_dir = SAVE PLOTS IN THIS DIRECTORY
+    save_dir = '/save/figures/in/this/dir/'
     
     # figure 2
-    plot_figure2(df, args.num_init_pts, args.imbals[0], args.tau_sequence, args.trials[0], num_sel_rnds, args.num_classes, args.dataset_name)
+    plot_figure2(df, args.num_init_pts, args.imbals[0], args.tau_sequence, args.trials[0], num_sel_rnds, args.num_classes, args.dataset_name, save_dir)
     # figure 3
-    plot_figure3(df, args.num_init_pts, args.imbals[0], args.taus[0], args.trials, np.arange(num_sel_rnds), args.dataset_name)
+    plot_figure3(df, args.num_init_pts, args.imbals[0], args.taus[0], args.trials, np.arange(num_sel_rnds), args.dataset_name, save_dir)
     # figure4
-    plot_figure4(df, args.num_init_pts, args.imbals[0], args.taus[0], args.trials, np.arange(num_sel_rnds), args.num_classes, args.dataset_name)
+    plot_figure4(df, args.num_init_pts, args.imbals[0], args.taus[0], args.trials, np.arange(num_sel_rnds), args.num_classes, args.dataset_name, save_dir)

@@ -3,7 +3,7 @@ import numpy as np
 import random
 import torch
 import argparse
-# import main experiment functions
+# import experiment functions
 from utils.main_exps.mnist_fed_dmgt import experiment as mnist_exp
 from utils.main_exps.imnet_fed_dmgt import experiment as imnet_exp
 from ..plots.fig5 import plot_figure5
@@ -88,8 +88,8 @@ if __name__ == "__main__":
 
     ### Plot Figures ###
 
-    #save_dir = SAVE PLOTS IN THIS DIRECTORY
+    save_dir = '/save/figures/in/this/dir/'
     
     # figure 5
-    plot_figure5(df, args.trials, np.arange(num_sel_rnds), args.stream_size, args.dataset_name)
+    plot_figure5(df, args.trials, np.arange(num_sel_rnds), args.stream_size, args.dataset_name, save_dir)
 
