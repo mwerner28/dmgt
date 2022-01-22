@@ -95,6 +95,8 @@ def experiment(num_init_pts,
             RAND_y = torch.empty(0)
             
             for agent in range(num_agents):
+                tau = taus[agent]
+
                 _, (agent_stream_x, agent_stream_y) = next(stream_samples_dict[agent])
                 agent_FED_DMGT_x, agent_FED_DMGT_y, agent_RAND_x, agent_RAND_y = get_subsets(agent_stream_x,
                                                                                              agent_stream_y,
