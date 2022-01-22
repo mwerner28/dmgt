@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     ### Plot Figures ###
 
-    fig_dir = SAVE PLOTS IN THIS DIRECTORY
+    fig_dir = '/save/figures/in/this/dir/'
     
     # figure 5
     plot_figure5(df, args.trials, np.arange(num_sel_rnds), args.dataset_name, fig_dir)
