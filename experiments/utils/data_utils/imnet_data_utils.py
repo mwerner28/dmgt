@@ -165,7 +165,7 @@ def get_test_embed_loaders(embed_dim,
     
     return test_embeds_loader, rare_val_embeds_loader, common_val_embeds_loader, val_embeds_loader
 
-# helper fucntion for get_test_embed_loaders -- constructs dataloader for imagenet val
+# internal function for get_test_embed_loaders -- constructs dataloader for imagenet val
 def get_test_loader(val_path, test_label_file, idx_conv_dict, batch_size, num_workers, class_dict):
 
     data_transform = Compose([Resize((224, 224)), ToTensor()])
@@ -183,7 +183,7 @@ def get_test_loader(val_path, test_label_file, idx_conv_dict, batch_size, num_wo
 
     return test_loader
 
-# helper function -- constructs resnet50 trained on simclr embeddings 
+# internal function -- constructs resnet50 trained on simclr embeddings 
 def get_base_model(weights_path, num_classes, device):
     
     model = resnet50(pretrained=False).to(device)
