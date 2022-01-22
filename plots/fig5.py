@@ -9,7 +9,8 @@ def plot_figure5(df,
                  trials,
                  sel_rnds,
                  stream_size,
-                 dataset_name)
+                 dataset_name,
+                 save_dir):
 
     fig, ax = plt.subplots() 
     
@@ -70,5 +71,5 @@ def plot_figure5(df,
 
     fig.text(0.001, 0.04, 'Round\nAvg. # sel. pts', fontsize=8)
     fig.tight_layout()
-    #fig.savefig(save_dir + f'_{dataset_name}_accuracy.pdf')
+    fig.savefig(save_dir + f'{dataset_name}_accuracy.pdf')
 

@@ -12,7 +12,8 @@ def plot_figure3(df,
                  tau,
                  trials,
                  sel_rnds,
-                 dataset_name):
+                 dataset_name,
+                 save_dir):
     
     fig, ax = plt.subplots()
 
@@ -89,5 +90,5 @@ def plot_figure3(df,
     plot.set_xlabel(None)
     
     fig.tight_layout()
-    #fig.savefig(save_dir + f'_{dataset_name}_accuracy.pdf')
+    fig.savefig(save_dir + f'{dataset_name}_accuracy.pdf')
 

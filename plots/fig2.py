@@ -15,7 +15,8 @@ def plot_figure2(df,
                  taus,
                  sel_rnd,
                  num_classes,
-                 dataset_name):
+                 dataset_name,
+                 save_dir):
     
     fig, ax = plt.subplots()
     
@@ -59,5 +60,5 @@ def plot_figure2(df,
     plot.set_ylabel('Size of Selected Set', fontsize=14)
     plot.legend(labels=['common','rare', 'ideal'], bbox_to_anchor=(0.7,0.3), prop={'size':8})
     
-    #fig.savefig(f'{dataset_name}_tau_v_size.pdf', bbox_inches = "tight")
+    fig.savefig(save_dir + f'{dataset_name}_tau_v_size.pdf', bbox_inches = "tight")
 

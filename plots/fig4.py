@@ -15,7 +15,8 @@ def plot_figure4(df,
                  trials,
                  sel_rnds,
                  num_classes,
-                 dataset_name):
+                 dataset_name,
+                 save_dir):
     
     n = Symbol('n')
     exp_lab_size = int((num_classes/2)*np.ceil(solve(sympy.sqrt(n+1) - sympy.sqrt(n) - tau, n)[0]))
@@ -96,5 +97,5 @@ def plot_figure4(df,
                ncol=1,
                loc='upper left')
 
-    #fig.savefig(save_dir + f'_{dataset_name}_class_balance.pdf')
+    fig.savefig(save_dir + f'{dataset_name}_class_balance.pdf')
 
