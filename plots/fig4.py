@@ -30,13 +30,12 @@ def plot_figure4(df,
              (df['num_init_pts']==num_init_pts) &
              (df['imbal']==imbal) &
              (df['tau']==tau)][['sel_rnd',
-                                  'DMGT_rare_amnt',
-                                  'RAND_rare_amnt',
-                                  'DMGT_common_amnt',
-                                  'RAND_common_amnt',
-                                  'trial']])
+                                'DMGT_rare_amnt',
+                                'RAND_rare_amnt',
+                                'DMGT_common_amnt',
+                                'RAND_common_amnt']])
     
-    plot = sns.lineplot(data=df[df['trial'].isin(trials)][['sel_rnd', 'DMGT_common_amnt']],
+    plot = sns.lineplot(data=df[['sel_rnd', 'DMGT_common_amnt']],
                         x='sel_rnd',
                         y='DMGT_common_amnt',
                         color=sns.color_palette('muted')[0],
@@ -44,7 +43,7 @@ def plot_figure4(df,
                         ci=95,
                         estimator='mean')
     
-    sns.lineplot(data=df[df['trial'].isin(trials)][['sel_rnd', 'DMGT_rare_amnt']],
+    sns.lineplot(data=df[['sel_rnd', 'DMGT_rare_amnt']],
                  x='sel_rnd',
                  y='DMGT_rare_amnt',
                  linewidth=2,
@@ -52,7 +51,7 @@ def plot_figure4(df,
                  ci=95,
                  estimator='mean')
     
-    sns.lineplot(data=df[df['trial'].isin(trials)][['sel_rnd', 'RAND_common_amnt']],
+    sns.lineplot(data=df[['sel_rnd', 'RAND_common_amnt']],
                  x='sel_rnd',
                  y='RAND_common_amnt',
                  color=sns.color_palette('muted')[2],
@@ -60,7 +59,7 @@ def plot_figure4(df,
                  ci=95,
                  estimator='mean')
     
-    sns.lineplot(data=df[df['trial'].isin(trials)][['sel_rnd', 'RAND_rare_amnt']],
+    sns.lineplot(data=df[['sel_rnd', 'RAND_rare_amnt']],
                  x='sel_rnd',
                  y='RAND_rare_amnt',
                  linewidth=2,
@@ -74,7 +73,7 @@ def plot_figure4(df,
                  linewidth=2,
                  color=sns.color_palette('muted')[4])
      
-    round_skip=2 if dataset_name=='MNIST' else 1
+    round_skip=1 if dataset_name=='imagenet' else 2
     
     ax.xaxis.set_major_locator(ticker.FixedLocator(sel_rnds[::round_skip]))
     ax.xaxis.set_major_formatter(ticker.FixedFormatter([f'{i}' for i in sel_rnds[::round_skip]]))
@@ -97,5 +96,5 @@ def plot_figure4(df,
                ncol=1,
                loc='upper left')
 
-    fig.savefig(fig_dir + f'_{dataset_name}_class_balance.pdf')
+    fig.savefig(fig_dir + f'{dataset_name}_class_balance.pdf')
 
