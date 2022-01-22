@@ -20,5 +20,5 @@ git clone https://github.com/mwerner28/dmgt
 cd experiments
 conda env create -f environment.yml
 conda activate dmgt
-python run_dmgt.py --dataset_name='imagenet(or mnist)' --train_path='path/to/imagenet(or mnist)/train/' --val_path='path/to/imagenet(or mnist)/val/'
+python run_dmgt.py (or run_fed_dmgt.py for federated version)--dataset_name='imagenet(or mnist)' --train_path='path/to/imagenet(or mnist)/train/' --val_path='path/to/imagenet(or mnist)/val/'
 ```
