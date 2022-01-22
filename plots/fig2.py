@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
 import argparse
-# import dataframe from main experiment on imagenet
-from ../experiments/dmgt/run_exp import imnet_df
 
 def plot_figure2(df,
                  num_init_pts,
@@ -17,7 +15,6 @@ def plot_figure2(df,
                  taus,
                  sel_rnd,
                  num_classes,
-                 save_dir,
                  dataset_name):
     
     fig, ax = plt.subplots()
@@ -62,30 +59,5 @@ def plot_figure2(df,
     plot.set_ylabel('Size of Selected Set', fontsize=14)
     plot.legend(labels=['common','rare', 'ideal'], bbox_to_anchor=(0.7,0.3), prop={'size':8})
     
-    fig.savefig(f'{dataset_name}_tau_v_size.pdf', bbox_inches = "tight")
+    #fig.savefig(f'{dataset_name}_tau_v_size.pdf', bbox_inches = "tight")
 
-parser.add_argument('--num_init_pts', type=int, default=1000)
-parser.add_argument('--imbal', type=int, default=5)
-parser.add_argument('--taus', nargs='+', type=float, default=np.arange(0.05,0.45,0.05))
-parser.add_argument('--trials', nargs='+', type=int, default=np.arange(5))
-parser.add_argumen('--num_sel_rounds', type=int, default=6)
-parser.add_argument('--stream_size', type=int, default=1000)
-parser.add_argument('--num_test_pts', type=int, default=5000)
-parser.add_argument('--is_isoreg', type=bool, default=True)
-parser.add_argument('--seed', type=int, default=1)
-
-if __name__=='main':
-    
-    args = parser.parse_args()
-    save_dir = SAVE PLOTS HERE
-
-    # figure 2
-    plot_figure2(imnet_df,
-                 args.num_init_pts,
-                 args.imbal,
-                 args.taus,
-                 args.trials[0],
-                 args.num_sel_rnds,
-                 args.num_classes,
-                 save_dir,
-                 dataset_name='IMNET')

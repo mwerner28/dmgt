@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import seaborn as sns
 import argparse
-# import dataframes from main experiment on mnist and imagenet
-from ../experiments/dmgt/run_exp import mnist_df, imnet_df
 
 def plot_figure4(df,
                  num_init_pts,
@@ -16,10 +14,7 @@ def plot_figure4(df,
                  tau,
                  trials,
                  sel_rnds,
-                 stream_size,
-                 num_test_pts,
                  num_classes,
-                 save_dir,
                  dataset_name):
     
     n = Symbol('n')
@@ -101,46 +96,5 @@ def plot_figure4(df,
                ncol=1,
                loc='upper left')
 
-    fig.savefig(save_dir + f'_{dataset_name}_class_balance.pdf')
+    #fig.savefig(save_dir + f'_{dataset_name}_class_balance.pdf')
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--num_init_pts', type=int, default=1000)
-parser.add_argument('--imbal', type=int, default=5)
-parser.add_argument('--tau', type=float, default=0.1)
-parser.add_argument('--trials', nargs='+', type=int, default=np.arange(5))
-parser.add_argument('--mnist_num_sel_rnds', type=int, default=15)
-parser.add_argument('--imnet_num_sel_rnds', type=int, default=6)
-parser.add_argument('--stream_size', type=int, default=1000)
-parser.add_argument('--num_test_pts', type=int, default=5000)
-parser.add_argument('--seed', type=int, default=1)
-
-if __name__=='main':
-    
-    args = parser.parse_args()
-    save_dir = SAVE PLOTS HERE
-
-    # plot figure 4a
-    plot_figure4(mnist_df,
-                 args.num_init_pts,
-                 args.imbal,
-                 args.tau,
-                 args.trials,
-                 np.arange(args.mnist_num_sel_rnds),
-                 args.stream_size,
-                 args.num_test_pts,
-                 args.num_classes,
-                 save_dir,
-                 dataset_name='MNIST')
-
-    # plot figure 4b
-    plot_figure4(imnet_df,
-                 args.num_init_pts,
-                 args.imbal,
-                 args.tau,
-                 args.trials,
-                 np.arange(args.imnet_num_sel_rnds),
-                 args.stream_size,
-                 args.num_test_pts,
-                 args.num_classes,
-                 save_dir,
-                 dataset_name='IMNET')
