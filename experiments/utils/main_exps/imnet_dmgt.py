@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 # import internal functions
 from ..exp_utils import class_card, get_subsets, Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
-from ..data_utils.imnet_data_utils import get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
+from ..data_utils.imnet_data_utils import get_datasets, get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
 from ..dataframes import dmgt_df
 
 # main experiment -- runs DMGT and RAND; generates all data for figures
@@ -14,7 +14,6 @@ def experiment(init_pts,
                trials,
                num_algs,
                stream_size,
-               num_test_pts,
                num_epochs,
                batch_size,
                num_workers,
@@ -23,6 +22,7 @@ def experiment(init_pts,
                train_path,
                val_path,
                num_sel_rnds,
+               num_test_pts,
                embed_batch_size,
                embed_dim,
                folder_to_class_file,
@@ -61,10 +61,10 @@ def experiment(init_pts,
                                                                                                                      test_label_file,
                                                                                                                      class_dict,
                                                                                                                      num_test_pts,
+                                                                                                                     idx_conv_dict,
                                                                                                                      device)
     for init_pts_idx, num_init_pts in enumerate(init_pts):
         for imbal_idx, imbal in enumerate(imbals):
-            
             model, stream_dataset, sizes, sum_sizes, rare_acc, all_acc = train_init_model(test_embeds_loader,
                                                                                           num_init_pts,
                                                                                           imbal,
@@ -88,7 +88,6 @@ def experiment(init_pts,
             
             for tau_idx, tau in enumerate(taus):
                 for trial in trials:
-                    
                     DMGT_model = load_model(model, device, embed_dim, num_classes)
                     RAND_model = load_model(model, device, embed_dim, num_classes)
 
@@ -122,7 +121,8 @@ def experiment(init_pts,
                                                                                                     class_dict,
                                                                                                     device)
     
-    df = dmgt_df(rare_acc, all_acc, sizes, sum_sizes, init_pts, imbals, taus, trials, num_sel_rnds)                         
+    data = rare_acc, all_acc, sizes, sum_sizes
+    df = dmgt_df(data, init_pts, imbals, taus, trials, num_sel_rnds)                         
     
     return df
 
@@ -168,12 +168,12 @@ def train_init_model(test_embeds_loader,
     model = train(device, num_epochs, init_loader, model)
 
     rare_acc[:,:,:,:,0] = (
-            torch.cat((calc_acc(model, test_embeds_loader, num_classes)[0],
-                       calc_acc(model, test_embeds_loader, num_classes)[0])))
+            torch.cat((calc_acc(model, test_embeds_loader, num_classes, device)[0],
+                       calc_acc(model, test_embeds_loader, num_classes, device)[0])))
 
     all_acc[:,:,:,:,0] = (
-            torch.cat((calc_acc(model, test_embeds_loader, num_classes)[1],
-                       calc_acc(model, test_embeds_loader, num_classes)[1])))
+            torch.cat((calc_acc(model, test_embeds_loader, num_classes, device)[1],
+                       calc_acc(model, test_embeds_loader, num_classes, device)[1])))
 
     return model, stream_dataset, sizes, sum_sizes, rare_acc, all_acc
 
@@ -202,8 +202,8 @@ def update_models(DMGT_model,
                   class_dict,
                   device):
 
-    rare_isoreg = train_isoreg(DMGT_model, rare_val_embeds_loader)
-    common_isoreg = train_isoreg(DMGT_model, common_val_embeds_loader)
+    rare_isoreg = train_isoreg(DMGT_model, rare_val_embeds_loader, device)
+    common_isoreg = train_isoreg(DMGT_model, common_val_embeds_loader, device)
 
     DMGT_x, DMGT_y, RAND_x, RAND_y = get_subsets(stream_x, stream_y, tau, DMGT_model, num_classes, rare_isoreg, common_isoreg, device)
 
@@ -225,12 +225,12 @@ def update_models(DMGT_model,
                        RAND_model)
     
     rare_acc[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
-            torch.cat((calc_acc(DMGT_model, test_embeds_loader, num_classes)[0], 
-                       calc_acc(RAND_model, test_embeds_loader, num_classes)[0])))
+            torch.cat((calc_acc(DMGT_model, test_embeds_loader, num_classes, device)[0], 
+                       calc_acc(RAND_model, test_embeds_loader, num_classes, device)[0])))
     
     all_acc[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
-            torch.cat((calc_acc(DMGT_model, test_embeds_loader, num_classes)[1],
-                       calc_acc(RAND_model, test_embeds_loader, num_classes)[1])))
+            torch.cat((calc_acc(DMGT_model, test_embeds_loader, num_classes, device)[1],
+                       calc_acc(RAND_model, test_embeds_loader, num_classes, device)[1])))
 
     return DMGT_model, RAND_model, sizes, sum_sizes, rare_acc, all_acc
 

@@ -21,7 +21,6 @@ parser.add_argument('--num_agents', type=int, default=3)
 parser.add_argument('--trials', nargs='+', type=int, default=np.arange(5))
 parser.add_argument('--num_algs', type=int, default=2)
 parser.add_argument('--stream_size', type=int, default=1000)
-parser.add_argument('--num_test_pts', type=int, default=5000)
 parser.add_argument('--num_epochs', type=int, default=200)
 parser.add_argument('--batch_size', type=int, default=256)
 parser.add_argument('--num_workers', type=int, default=10)
@@ -32,13 +31,15 @@ parser.add_argument('--seed', type=int, default=0)
 parser.add_argument('--imnet_num_sel_rnds', type=int, default=6)
 parser.add_argument('--imnet_embed_batch_size', type=int, default=256)
 parser.add_argument('--imnet_embed_dim', type=int, default=2048)
-parser.add_argument('--imnet_folder_to_class_file', type=str, default='../../imagenet_datafiles/folder_to_class.txt')
-parser.add_argument('--imnet_test_label_file', type=str, default='../../imagenet_datafiles/test_classes.txt')
-# can find simclr resnet50 model for pytorch here: https://github.com/tonylins/simclr-converter -- we use ResNet-50(1x)
-parser.add_argument('--imnet_smclr_weights_path', type=str, default='path/to/simclr_resnet50/model') 
+parser.add_argument('--imnet_folder_to_class_file', type=str, default='/path/to/dmgt/experiments/utils/imagenet_datafiles/folder_to_class.txt')
+parser.add_argument('--imnet_test_label_file', type=str, default='/path/to/dmgt/experiments/utils/imagenet_datafiles/test_classes.txt')
+# download pre-trained simclr resnet50 model, pytorch version, here: https://github.com/tonylins/simclr-converter -- we use ResNet-50(1x)
+parser.add_argument('--imnet_smclr_weights_path', type=str, default='/path/to/simclr_resnet50/model') 
+parser.add_argument('--imnet_num_test_pts', type=int, default=500)
 
 # extra mnist paramaters
 parser.add_argument('--mnist_num_sel_rnds', type=int, default=10)
+parser.add_argument('--mnist_num_test_pts', type=int, default=5000)
 
 if __name__ == "__main__":
     
@@ -60,7 +61,6 @@ if __name__ == "__main__":
                   args.num_agents,
                   args.num_algs,
                   args.stream_size,
-                  args.num_test_pts,
                   args.num_epochs,
                   args.batch_size,
                   args.num_workers,
@@ -68,11 +68,13 @@ if __name__ == "__main__":
                   device]
     
     mnist_args = [args.train_path,
-                  args.mnist_num_sel_rnds]
+                  args.mnist_num_sel_rnds,
+                  args.mnist_num_test_pts]
 
     imnet_args = [args.train_path,
                   args.val_path,
                   args.imnet_num_sel_rnds,
+                  args.imnet_num_test_pts,
                   args.imnet_embed_batch_size,
                   args.imnet_embed_dim,
                   args.imnet_folder_to_class_file,
@@ -89,7 +91,7 @@ if __name__ == "__main__":
 
     ### Plot Figures ###
 
-    fig_dir = '/save/figures/in/this/dir/'
+    fig_dir = '/save/figures/in/this/directory/'
     
     # figure 5
     plot_figure5(df, args.trials, np.arange(num_sel_rnds), args.dataset_name, fig_dir)

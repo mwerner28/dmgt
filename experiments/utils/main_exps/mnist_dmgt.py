@@ -13,14 +13,14 @@ def experiment(init_pts,
                trials,
                num_algs,
                stream_size,
-               num_test_pts,
                num_epochs,
                batch_size,
                num_workers,
                num_classes,
                device,
                data_path,
-               num_sel_rnds):
+               num_sel_rnds,
+               num_test_pts):
 
     rare_acc=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,num_algs)
     all_acc=torch.zeros(len(init_pts),len(imbals),len(taus),len(trials),num_sel_rnds+1,num_algs)
@@ -56,7 +56,7 @@ def experiment(init_pts,
                     stream_loader = DataLoader(stream_dataset, batch_size=stream_size, num_workers=num_workers, shuffle=True)
                     stream_samples = enumerate(stream_loader)
                     
-                    for sel_round in range(num_sel_rnds):
+                    for sel_rnd in range(num_sel_rnds):
                         _, (stream_x, stream_y) = next(stream_samples)
                         DMGT_model, RAND_model, sizes, sum_sizes, rare_acc, all_acc = update_models(DMGT_model,
                                                                                                     RAND_model,
@@ -70,7 +70,7 @@ def experiment(init_pts,
                                                                                                     tau_idx,
                                                                                                     tau,
                                                                                                     trial,
-                                                                                                    sel_round,
+                                                                                                    sel_rnd,
                                                                                                     num_epochs,
                                                                                                     batch_size,
                                                                                                     num_workers,
@@ -80,8 +80,9 @@ def experiment(init_pts,
                                                                                                     rare_acc,
                                                                                                     all_acc,
                                                                                                     device)
-        
-    df = dmgt_df(rare_acc, all_acc, sizes, sum_sizes, init_pts, imbals, taus, trials, num_sel_rnds)
+    
+    data = rare_acc, all_acc, sizes, sum_sizes
+    df = dmgt_df(data, init_pts, imbals, taus, trials, num_sel_rnds)
     
     return df
 
@@ -121,12 +122,12 @@ def train_init_model(test_loader,
     model = train(device, num_epochs, init_loader, model)
 
     rare_acc[:,:,:,:,0] = (
-            torch.cat((calc_acc(model, test_loader, num_classes)[0], 
-                       calc_acc(model, test_loader, num_classes)[0])))
+            torch.cat((calc_acc(model, test_loader, num_classes, device)[0], 
+                       calc_acc(model, test_loader, num_classes, device)[0])))
     
     all_acc[:,:,:,:,0] = (
-            torch.cat((calc_acc(model, test_loader, num_classes)[1],
-                       calc_acc(model, test_loader, num_classes)[1])))
+            torch.cat((calc_acc(model, test_loader, num_classes, device)[1],
+                       calc_acc(model, test_loader, num_classes, device)[1])))
     
     return model, stream_dataset, sizes, sum_sizes, rare_acc, all_acc
 
@@ -143,7 +144,7 @@ def update_models(DMGT_model,
                   tau_idx,
                   tau,
                   trial,
-                  sel_round,
+                  sel_rnd,
                   num_epochs,
                   batch_size,
                   num_workers,
@@ -154,17 +155,17 @@ def update_models(DMGT_model,
                   all_acc,
                   device):
 
-    rare_isoreg = train_isoreg(DMGT_model, rare_val_loader)
-    common_isoreg = train_isoreg(DMGT_model, common_val_loader)
+    rare_isoreg = train_isoreg(DMGT_model, rare_val_loader, device)
+    common_isoreg = train_isoreg(DMGT_model, common_val_loader, device)
     
     DMGT_x, DMGT_y, RAND_x, RAND_y = get_subsets(stream_x, stream_y, tau, DMGT_model, num_classes, rare_isoreg, common_isoreg, device)
     
-    sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_round+1] = (
+    sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
             torch.stack((torch.tensor([(DMGT_y==i).float().sum() for i in range(num_classes)]),
                          torch.tensor([(RAND_y==i).float().sum() for i in range(num_classes)]))))
     
-    sum_sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_round+1] = (
-            torch.tensor([sum_sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_round] + len(DMGT_y)]))
+    sum_sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
+            torch.tensor([sum_sizes[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd] + len(DMGT_y)]))
         
     DMGT_model = train(device,
                        num_epochs,
@@ -176,13 +177,13 @@ def update_models(DMGT_model,
                        DataLoader(TensorDataset(RAND_x, RAND_y), batch_size=batch_size, num_workers=num_workers, shuffle=True),
                        RAND_model)
     
-    rare_acc[init_pts_idx,imbal_idx,tau_idx,trial,sel_round+1] = (
-            torch.cat((calc_acc(DMGT_model, test_loader, num_classes)[0], 
-                       calc_acc(RAND_model, test_loader, num_classes)[0])))
+    rare_acc[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
+            torch.cat((calc_acc(DMGT_model, test_loader, num_classes, device)[0], 
+                       calc_acc(RAND_model, test_loader, num_classes, device)[0])))
     
-    all_acc[init_pts_idx,imbal_idx,tau_idx,trial,sel_round+1] = (
-            torch.cat((calc_acc(DMGT_model, test_loader, num_classes)[1],
-                       calc_acc(RAND_model, test_loader, num_classes)[1])))
+    all_acc[init_pts_idx,imbal_idx,tau_idx,trial,sel_rnd+1] = (
+            torch.cat((calc_acc(DMGT_model, test_loader, num_classes, device)[1],
+                       calc_acc(RAND_model, test_loader, num_classes, device)[1])))
     
     return DMGT_model, RAND_model, sizes, sum_sizes, rare_acc, all_acc
 

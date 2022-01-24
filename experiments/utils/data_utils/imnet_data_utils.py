@@ -122,11 +122,9 @@ def get_test_embed_loaders(embed_dim,
     test_embeds_labels = torch.zeros([num_test_pts])
     
     inv_dict = {idx_conv_dict[k]:k for k in idx_conv_dict}
-    
     with torch.no_grad():
         for idx, (data, targets) in enumerate(test_loader):
             data = data.to(device)
-
             targets = torch.tensor([class_dict[inv_dict[y.item()]] for y in targets]) 
             test_embeds[idx*embed_batch_size: min(num_test_pts, (idx+1)*embed_batch_size)] = embed_model(data).squeeze()
             test_embeds_labels[idx*embed_batch_size: min(num_test_pts, (idx+1)*embed_batch_size)] = targets
@@ -170,7 +168,6 @@ def get_test_loader(val_path, test_label_file, idx_conv_dict, batch_size, num_wo
     data_transform = Compose([Resize((224, 224)), ToTensor()])
     
     labels = [int(y) for y in genfromtxt(test_label_file)]
-    
     test_dataset = ImageFolder(val_path, transform=data_transform)
     test_dataset.samples = list(map(lambda x, y: (x[0], y), test_dataset.samples, labels))
     test_dataset.targets = labels

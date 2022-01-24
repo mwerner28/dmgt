@@ -10,7 +10,7 @@ from os.path import exists as file_exists
 import argparse
 # import internal functions
 from ..exp_utils import class_card, get_subsets, Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
-from ..data_utils.imnet_data_utils import get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
+from ..data_utils.imnet_data_utils import get_datasets, get_embed_loader, get_embeds, get_test_embed_loaders, get_test_loader
 from ..dataframes import fed_dmgt_df
 
 # main experiment -- runs DMGT and RAND; generates all data for figures
@@ -18,10 +18,9 @@ def experiment(num_init_pts,
                imbals,
                taus,
                trials,
-               num_algs,
                num_agents,
+               num_algs,
                stream_size,
-               num_test_pts,
                num_epochs,
                batch_size,
                num_workers,
@@ -30,6 +29,7 @@ def experiment(num_init_pts,
                train_path,
                val_path,
                num_sel_rnds,
+               num_test_pts,
                embed_batch_size,
                embed_dim,
                folder_to_class_file,
@@ -68,6 +68,7 @@ def experiment(num_init_pts,
                                                                                                                      test_label_file,
                                                                                                                      class_dict,
                                                                                                                      num_test_pts,
+                                                                                                                     idx_conv_dict,
                                                                                                                      device)
 
     init_x = torch.empty(0)
@@ -85,7 +86,7 @@ def experiment(num_init_pts,
         init_y = torch.cat((init_y, agent_init_y[:int(np.ceil(num_init_pts/num_agents))]))
 
         stream_datasets_dict[agent] = agent_stream_dataset
-
+    
     sizes[:,0] = (torch.stack((torch.tensor([(init_y==i).sum() for i in range(num_classes)]),
                                torch.tensor([(init_y==i).sum() for i in range(num_classes)]))))
 
@@ -96,20 +97,20 @@ def experiment(num_init_pts,
     model = LogRegModel(embed_dim, num_classes) 
     model = train(device, num_epochs, init_loader, model)
         
-    rare_isoreg = train_isoreg(model, rare_val_embeds_loader)
-    common_isoreg = train_isoreg(model, common_val_embeds_loader)
+    rare_isoreg = train_isoreg(model, rare_val_embeds_loader, device)
+    common_isoreg = train_isoreg(model, common_val_embeds_loader, device)
     
     rare_acc[:,0] = (
-            torch.cat((calc_acc(model, test_embeds_loader, num_classes)[0], 
-                       calc_acc(model, test_embeds_loader, num_classes)[0])))
+            torch.cat((calc_acc(model, test_embeds_loader, num_classes, device)[0], 
+                       calc_acc(model, test_embeds_loader, num_classes, device)[0])))
     
     all_acc[:,0] = (
-            torch.cat((calc_acc(model, test_embeds_loader, num_classes)[1],
-                       calc_acc(model, test_embeds_loader, num_classes)[1])))
+            torch.cat((calc_acc(model, test_embeds_loader, num_classes, device)[1],
+                       calc_acc(model, test_embeds_loader, num_classes, device)[1])))
     
     for trial in trials:
-        FED_DMGT_model = load_model(model, embed_dim, num_classes, device)
-        RAND_model = load_model(model, embed_dim, num_classes, device)
+        FED_DMGT_model = load_model(model, device, embed_dim, num_classes)
+        RAND_model = load_model(model, device, embed_dim, num_classes)
 
         stream_loaders_dict = {agent: DataLoader(stream_datasets_dict[agent],
                                                  batch_size=stream_size,
@@ -119,7 +120,6 @@ def experiment(num_init_pts,
         stream_samples_dict = {agent: enumerate(stream_loaders_dict[agent]) for agent in range(num_agents)}
         
         for sel_rnd in range(num_sel_rnds):
-
             FED_DMGT_x = torch.empty(0)
             FED_DMGT_y = torch.empty(0)
             RAND_x = torch.empty(0)
@@ -127,14 +127,12 @@ def experiment(num_init_pts,
 
             for agent in range(num_agents):
                 tau = taus[agent]
-
                 _, (agent_stream_x, agent_stream_y) = next(stream_samples_dict[agent])
                 agent_FED_DMGT_x, agent_FED_DMGT_y, agent_RAND_x, agent_RAND_y = get_subsets(agent_stream_x,
                                                                                              agent_stream_y,
                                                                                              tau,
                                                                                              FED_DMGT_model,
                                                                                              num_classes,
-                                                                                             is_isoreg,
                                                                                              rare_isoreg,
                                                                                              common_isoreg,
                                                                                              device)
@@ -157,8 +155,8 @@ def experiment(num_init_pts,
                                    DataLoader(TensorDataset(FED_DMGT_x, FED_DMGT_y), batch_size=batch_size, num_workers=num_workers, shuffle=True),
                                    FED_DMGT_model)
 
-            rare_isoreg = train_isoreg(FED_DMGT_model, rare_val_embeds_loader)
-            common_isoreg = train_isoreg(FED_DMGT_model, common_val_embeds_loader)
+            rare_isoreg = train_isoreg(FED_DMGT_model, rare_val_embeds_loader, device)
+            common_isoreg = train_isoreg(FED_DMGT_model, common_val_embeds_loader, device)
                 
             RAND_model = train(device,
                                num_epochs,
@@ -166,14 +164,15 @@ def experiment(num_init_pts,
                                RAND_model)
             
             rare_acc[trial,sel_rnd+1] = (
-                    torch.cat((calc_acc(FED_DMGT_model, test_embeds_loader, num_classes)[0], 
-                               calc_acc(RAND_model, test_embeds_loader, num_classes)[0])))
+                    torch.cat((calc_acc(FED_DMGT_model, test_embeds_loader, num_classes, device)[0], 
+                               calc_acc(RAND_model, test_embeds_loader, num_classes, device)[0])))
             
             all_acc[trial,sel_rnd+1] = (
-                    torch.cat((calc_acc(FED_DMGT_model, test_embeds_loader, num_classes)[1],
-                               calc_acc(RAND_model, test_embeds_loader, num_classes)[1])))
+                    torch.cat((calc_acc(FED_DMGT_model, test_embeds_loader, num_classes, device)[1],
+                               calc_acc(RAND_model, test_embeds_loader, num_classes, device)[1])))
     
-    df = fed_dmgt_df(rare_acc, all_acc, sizes, sum_sizes, trials, num_sel_rnds)
+    data = rare_acc, all_acc, sizes, sum_sizes
+    df = fed_dmgt_df(data, trials, num_sel_rnds)
     
     return df
 

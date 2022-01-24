@@ -15,19 +15,19 @@ from ..dataframes import fed_dmgt_df
 # main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(num_init_pts,
                imbals,
-               tau,
+               taus,
                trials,
                num_agents,
                num_algs,
                stream_size,
-               num_test_pts,
                num_epochs,
                batch_size,
                num_workers,
                num_classes,
                device,
                data_path,
-               num_sel_rnds):
+               num_sel_rnds,
+               num_test_pts):
         
     rare_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
     all_acc=torch.zeros(len(trials),num_sel_rnds+1,num_algs)
@@ -64,20 +64,18 @@ def experiment(num_init_pts,
     model = MnistResNet()
     model = train(device, num_epochs, init_loader, model)
 
-    rare_isoreg = train_isoreg(model, rare_val_loader)
-    common_isoreg = train_isoreg(model, common_val_loader)
+    rare_isoreg = train_isoreg(model, rare_val_loader, device)
+    common_isoreg = train_isoreg(model, common_val_loader, device)
     
     rare_acc[:,0] = (
-
-        torch.cat((calc_acc(model, test_loader, num_classes)[0], 
-                   calc_acc(model, test_loader, num_classes)[0])))
+        torch.cat((calc_acc(model, test_loader, num_classes, device)[0], 
+                   calc_acc(model, test_loader, num_classes, device)[0])))
     
     all_acc[:,0] = (
-            
-        torch.cat((calc_acc(model, test_loader, num_classes)[1],
-                   calc_acc(model, test_loader, num_classes)[1])))
+        torch.cat((calc_acc(model, test_loader, num_classes, device)[1],
+                   calc_acc(model, test_loader, num_classes, device)[1])))
     
-    for trial in trials: 
+    for trial in trials:
         FED_DMGT_model = load_model(model, device)
         RAND_model = load_model(model, device)
         
@@ -96,7 +94,6 @@ def experiment(num_init_pts,
             
             for agent in range(num_agents):
                 tau = taus[agent]
-
                 _, (agent_stream_x, agent_stream_y) = next(stream_samples_dict[agent])
                 agent_FED_DMGT_x, agent_FED_DMGT_y, agent_RAND_x, agent_RAND_y = get_subsets(agent_stream_x,
                                                                                              agent_stream_y,
@@ -133,20 +130,19 @@ def experiment(num_init_pts,
                                DataLoader(TensorDataset(RAND_x, RAND_y), batch_size=batch_size, num_workers=num_workers, shuffle=True),
                                RAND_model)
                         
-            rare_isoreg = train_isoreg(FED_DMGT_model, rare_val_loader)
-            common_isoreg = train_isoreg(FED_DMGT_model, common_val_loader)
+            rare_isoreg = train_isoreg(FED_DMGT_model, rare_val_loader, device)
+            common_isoreg = train_isoreg(FED_DMGT_model, common_val_loader, device)
     
             rare_acc[trial,sel_rnd+1] = (
-
-                     torch.cat((calc_acc(FED_DMGT_model, test_loader, num_classes)[0], 
-                                calc_acc(RAND_model, test_loader, num_classes)[0])))
+                     torch.cat((calc_acc(FED_DMGT_model, test_loader, num_classes, device)[0], 
+                                calc_acc(RAND_model, test_loader, num_classes, device)[0])))
             
             all_acc[trial,sel_rnd+1] = (
-                    
-                    torch.cat((calc_acc(FED_DMGT_model, test_loader, num_classes)[1],
-                               calc_acc(RAND_model, test_loader, num_classes)[1])))
-
-    df = fed_dmgt_df(rare_acc, all_acc, sizes, sum_sizes, trials, num_sel_rnds)
+                    torch.cat((calc_acc(FED_DMGT_model, test_loader, num_classes, device)[1],
+                               calc_acc(RAND_model, test_loader, num_classes, device)[1])))
+    
+    data = rare_acc, all_acc, sizes, sum_sizes
+    df = fed_dmgt_df(data, trials, num_sel_rnds)
     
     return df
 

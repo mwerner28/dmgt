@@ -1,3 +1,4 @@
+import numpy as np
 import torch 
 from torch import nn, optim
 from torchvision.models.resnet import ResNet, Bottleneck
@@ -81,7 +82,7 @@ def train(device, num_epochs, train_loader, model):
     return model
 
 # calculates prediction accuracy of input model on all and rare classes of test data
-def calc_acc(model, test_loader, num_classes):
+def calc_acc(model, test_loader, num_classes, device):
 
     model.eval()
     
@@ -104,7 +105,7 @@ def calc_acc(model, test_loader, num_classes):
     return rare_acc.float().mean().unsqueeze(0), all_acc.float().mean().unsqueeze(0)
 
 # trains isotonic regressor from input model's top-score prediction on validation data to 0-1 indicator of correc prediction
-def train_isoreg(model, val_loader):
+def train_isoreg(model, val_loader, device):
     model.eval()
 
     top_scores = []
