@@ -17,6 +17,7 @@ def plot_figure2(df,
                  dataset_name,
                  fig_dir):
     
+    print ('got in here')
     fig, ax = plt.subplots()
     
     ax.spines['right'].set_visible(False)
@@ -24,7 +25,8 @@ def plot_figure2(df,
     
     df = (df[(df['sel_rnd']==sel_rnd) &
              (df['num_init_pts']==num_init_pts) &
-             (df['imbal']==imbal)][['tau',
+             (df['imbal']==imbal) &
+             (df['trial']==trial)][['tau',
                                     'DMGT_rare_amnt',
                                     'DMGT_common_amnt']])
     

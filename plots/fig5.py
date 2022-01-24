@@ -65,5 +65,5 @@ def plot_figure5(df,
 
     fig.text(0.001, 0.04, 'Round\nAvg. # sel. pts', fontsize=8)
     fig.tight_layout()
-    fig.savefig(fig_dir + f'{dataset_name}_accuracy.pdf')
+    fig.savefig(fig_dir + f'{dataset_name}_fed_accuracy.pdf')
 

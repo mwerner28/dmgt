@@ -63,10 +63,9 @@ def plot_figure3(df,
     for sel_rnd in sel_rnds:
         sizes_labels += [int(np.floor(df[df['sel_rnd']==sel_rnd]['sum_sizes'].mean()))]
     
+    round_skip=1 if dataset_name=='imagenet' else 2
     ax.xaxis.set_major_locator(ticker.FixedLocator(sel_rnds[::round_skip]))
     ax.xaxis.set_major_formatter(ticker.FixedFormatter([f'{i}'+'\n'+f'{sizes_labels[i]}' for i in sel_rnds[::round_skip]]))
-   
-    round_skip=1 if dataset_name=='imagenet' else 2
     
     plot.set_xlabel(None)
     plot.set_ylabel('Accuracy', fontsize=14, labelpad=7)
