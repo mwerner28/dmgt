@@ -1,5 +1,3 @@
-#/home/eecs/mwerner/IMNET_CODE/weights_dir/resnet50-1x.pth'
-
 import numpy as np
 import random
 import torch
