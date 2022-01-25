@@ -80,13 +80,6 @@ def plot_figure4(df,
     plot.set_xlabel('Round', fontsize=14, labelpad=7)
     plot.set_ylabel('Size of Selected Set', fontsize=14, labelpad=7)
     
-    fig.subplots_adjust(
-        top=0.75,
-        bottom=0.1,
-        left=0.13,
-        right=0.97
-    )
-
     fig.legend(labels=['DMGT: common classes',
                        'DMGT: rare classes',
                        'RAND: common classes',
