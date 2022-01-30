@@ -92,6 +92,10 @@ def experiment(num_init_pts,
             RAND_x = torch.empty(0)
             RAND_y = torch.empty(0)
             
+            ## replace previous two lines with these two if running METAFED-DMGT
+            # stream_x = torch.empty(0)
+            # stream_y = torch.empty(0)
+            
             for agent in range(num_agents):
                 tau = taus[agent]
                 _, (agent_stream_x, agent_stream_y) = next(stream_samples_dict[agent])
@@ -109,6 +113,18 @@ def experiment(num_init_pts,
                 FED_DMGT_y = torch.cat((FED_DMGT_y, agent_FED_DMGT_y))
                 RAND_x = torch.cat((RAND_x, agent_RAND_x))                
                 RAND_y = torch.cat((RAND_y, agent_RAND_y))
+            
+                ## replace previous two lines with these two if running METAFED-DMGT
+                
+                # stream_x = torch.cat((stream_x, agent_stream_x))
+                # stream_y = torch.cat((stream_y, agent_stream_y))
+            
+            ## uncomment the following lines if running METAFED-DMGT
+            
+            # FED_DMGT_x, FED_DMGT_y = get_subsets(FED_DMGT_x, FED_DMGT_y, tau, FED_DMGT_model, num_classes, rare_isoreg, common_isoreg, device)
+            # rand_idxs = torch.randperm(len(stream_x))[:len(FED_DMGT_x)]
+            # RAND_x = stream_x[rand_idxs]
+            # RAND_y = stream_y[rand_idxs]
             
             sizes[trial,sel_rnd+1] = (
                    
