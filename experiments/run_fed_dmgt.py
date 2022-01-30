@@ -7,7 +7,7 @@ import sys
 from utils.main_exps.mnist_fed_dmgt import experiment as mnist_exp
 from utils.main_exps.imnet_fed_dmgt import experiment as imnet_exp
 sys.path.insert(0, '..')
-from plots.fig5 import plot_figure5
+from plots.fig5_6 import plot_figure5_6
 
 parser = argparse.ArgumentParser()
 # experiment parameters for mnist and imagenet
@@ -93,6 +93,6 @@ if __name__ == "__main__":
 
     fig_dir = '/save/figures/in/this/directory/'
     
-    # figure 5
-    plot_figure5(df, args.trials, np.arange(num_sel_rnds), args.dataset_name, fig_dir)
+    # figure 5 or 6
+    plot_figure5_6(df, args.trials, np.arange(num_sel_rnds), args.dataset_name, fig_dir)
 
