@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="297mm"
-   height="210mm"
-   viewBox="0 0 297 210"
+   width="177.92554mm"
+   height="78.08181mm"
+   viewBox="0 0 177.92554 78.08181"
    version="1.1"
    id="svg5"
    inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
@@ -21,18 +21,22 @@
      borderopacity="1"
      inkscape:pageshadow="0"
      inkscape:pageopacity="1"
-     inkscape:pagecheckerboard="0"
+     inkscape:pagecheckerboard="false"
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.48640572"
-     inkscape:cx="397.81604"
-     inkscape:cy="561.25984"
+     inkscape:cx="325.85965"
+     inkscape:cy="501.63883"
      inkscape:window-width="1312"
      inkscape:window-height="768"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer1"
+     fit-margin-top="0.4"
+     fit-margin-left="1.7"
+     fit-margin-right="1.7"
+     fit-margin-bottom="0" />
   <defs
      id="defs2">
     <clipPath
@@ -221,11 +225,12 @@
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     transform="translate(-18.793838,-15.6535)">
     <g
        id="g830"
        inkscape:label="imnet_demo"
-       transform="matrix(0.35277777,0,0,0.35277777,18.793837,11.440516)">
+       transform="matrix(0.35277777,0,0,0.35277777,22.498006,13.028017)">
       <g
          id="g832">
         <text
