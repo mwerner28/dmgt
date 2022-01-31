@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="182.76924mm"
-   height="85.4011mm"
-   viewBox="0 0 182.76924 85.4011"
+   width="189.29671mm"
+   height="89.208786mm"
+   viewBox="0 0 189.29671 89.208786"
    version="1.1"
    id="svg5"
    inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
@@ -25,8 +25,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.48640572"
-     inkscape:cx="292.9653"
-     inkscape:cy="359.78195"
+     inkscape:cx="214.84122"
+     inkscape:cy="-76.068184"
      inkscape:window-width="1312"
      inkscape:window-height="768"
      inkscape:window-x="0"
@@ -226,11 +226,11 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-27.741763,-53.227274)">
+     transform="translate(-48.412094,-168.53117)">
     <g
        style="shape-rendering:crispEdges"
        id="g1516"
-       transform="translate(26.041763,52.827274)">
+       transform="translate(46.712093,168.13117)">
       <g
          id="g830"
          inkscape:label="imnet_demo"
@@ -813,5 +813,12 @@
        height="93.640862"
        x="27.741764"
        y="53.227272" />
+    <rect
+       style="fill:#ffffff;fill-opacity:0.0155211;stroke:none;stroke-width:0.856071;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect10562"
+       width="189.29671"
+       height="89.208786"
+       x="48.412094"
+       y="168.53117" />
   </g>
 </svg>
