@@ -1,6 +1,4 @@
 name: dmgt
-channels:
-  - conda-forge
 dependencies:
   - pip
   - python=3.9
@@ -8,9 +6,11 @@ dependencies:
   - numpy-base
   - matplotlib
   - matplotlib-base
-  - scipy
   - pandas
-  - pillow
   - seaborn
   - tqdm
-  - statsmodels
+  - pytorch
+  - torchvision
+  - scikit-learn
+  - sympy
+
