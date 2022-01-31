@@ -802,10 +802,17 @@
        x="27.741764"
        y="11.42308" />
     <rect
-       style="fill:#28ffff;fill-opacity:0.50332594;stroke-width:0.964999"
+       style="fill:#ffffff;fill-opacity:0.00884956;stroke-width:0.964999"
        id="rect1367"
        width="182.76924"
        height="85.4011"
+       x="27.741764"
+       y="54.285606" />
+    <rect
+       style="fill:#ffffff;fill-opacity:0.420354;stroke-width:0.964999"
+       id="rect3134"
+       width="193.10439"
+       height="93.640862"
        x="27.741764"
        y="53.227272" />
   </g>
