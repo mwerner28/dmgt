@@ -3,7 +3,7 @@
 @article{mwerner2022dmgt,
   title={Online Active Learning with Dynamic Marginal Gain Thresholding},
   author={Werner, Mariel A and Angelopoulos, Anastasios N and Bates, Stephen and Jordan, Michael I},
-  journal={arXiv preprint arXiv:?},
+  journal={arXiv preprint arXiv:2201.10547},
   year={2022}
 }
 ```
