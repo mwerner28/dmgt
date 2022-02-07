@@ -1,6 +1,8 @@
 import numpy as np 
 import random
 import torch 
+import os
+from os.path import exists as file_exists
 from torch.utils.data import DataLoader, TensorDataset
 # import internal functions
 from ..exp_utils import class_card, get_subsets, Embed, LogRegModel, train, load_model, calc_acc, train_isoreg
@@ -40,7 +42,7 @@ def experiment(init_pts,
     rare_classes = classes[:int(num_classes/2)]
     common_classes = classes[int(num_classes/2):]
     class_dict = dict(zip(rare_classes+common_classes, range(num_classes)))
-
+    
     embeds, labels, idx_conv_dict = get_embeds(train_path,
                                                class_dict,
                                                embed_dim,
@@ -50,7 +52,7 @@ def experiment(init_pts,
                                                weights_path,
                                                folder_to_class_file,
                                                device)
-    
+
     test_embeds_loader, rare_val_embeds_loader, common_val_embeds_loader, val_embeds_loader = get_test_embed_loaders(embed_dim,
                                                                                                                      embed_batch_size,
                                                                                                                      batch_size,
@@ -83,7 +85,6 @@ def experiment(init_pts,
                                                                                           embeds,
                                                                                           labels,
                                                                                           device)
-            
             
             
             for tau_idx, tau in enumerate(taus):
@@ -120,10 +121,9 @@ def experiment(init_pts,
                                                                                                     all_acc,
                                                                                                     class_dict,
                                                                                                     device)
-    
+        
     data = rare_acc, all_acc, sizes, sum_sizes
     df = dmgt_df(data, init_pts, imbals, taus, trials, num_sel_rnds)                         
-    
     return df
 
 ######## Internal Functions ########
