@@ -1,4 +1,6 @@
 name: dmgt
+channels:
+  - pytorch
 dependencies:
   - pip
   - python=3.9
@@ -13,4 +15,4 @@ dependencies:
   - torchvision
   - scikit-learn
   - sympy
-
+  - line_profiler
