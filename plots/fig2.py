@@ -10,14 +10,13 @@ import argparse
 def plot_figure2(df,
                  num_init_pts,
                  imbal,
-                 trial,
                  taus,
+                 trial,
                  sel_rnd,
                  num_classes,
                  dataset_name,
                  fig_dir):
     
-    print ('got in here')
     fig, ax = plt.subplots()
     
     ax.spines['right'].set_visible(False)
