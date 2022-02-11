@@ -18,7 +18,7 @@ parser.add_argument('--train_path', type=str, default='path/to/imagenet/train')
 parser.add_argument('--val_path', type=str, default='path/to/imagenet/val')
 parser.add_argument('--init_pts', nargs='+', type=int, default=[1000])
 parser.add_argument('--imbals', nargs='+', type=int, default=[5])
-# if wanting to plot figure 2, change this line to: parser.add_argument('--tau_sequence', nargs='+', type=float, default=np.arange(0.05,0.45,0.05))
+# if wanting to plot figure 2, change this line to: parser.add_argument('--taus', nargs='+', type=float, default=np.arange(0.05,0.45,0.05))
 parser.add_argument('--taus', nargs='+', type=float, default=[0.1])
 # if wanting to plot figure 2, change this line to: change --trials default to: parser.add_argument('--trials', nargs='+', type=int, default=np.arange(0))
 parser.add_argument('--trials', nargs='+', type=int, default=np.arange(5))
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     
     fig_dir = '/save/figures/in/this/directory/'
     
-    ## Note: can't plot figure 2 simultaneously with figure 3 and 4 (see argument changes above)
+    ## Note: can't plot figure 2 simultaneously with figures 3 and 4 (see argument changes above)
     # figure 2
     plot_figure2(df, args.init_pts[0], args.imbals[0], args.taus, args.trials[0], num_sel_rnds, args.num_classes, args.dataset_name, fig_dir)
     # figure 3
