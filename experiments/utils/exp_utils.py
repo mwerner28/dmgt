@@ -8,10 +8,7 @@ from sklearn.isotonic import IsotonicRegression
 class MnistResNet(ResNet):
     def __init__(self):
         super(MnistResNet, self).__init__(Bottleneck, [3, 4, 6, 3], num_classes=10)
-        self.conv1 = torch.nn.Conv2d(1, 64, 
-            kernel_size=7, 
-            stride=2, 
-            padding=3, bias=False)
+        self.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
 # wrapper for resnet (in imagenet experiment, accepts image and outputs penultimate embedding layer instead of softmax scores)
 class Embed(nn.Module):

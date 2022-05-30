@@ -10,7 +10,7 @@ import argparse
 # import internal functions
 from ..exp_utils import class_card, get_subsets, MnistResNet, train, load_model, calc_acc, train_isoreg
 from ..data_utils.mnist_data_utils import get_datasets, get_val_loaders
-from ..dataframes import fed_dmgt_df
+from ..dataframes import dist_dmgt_df
 
 # main experiment -- runs DMGT and RAND; generates all data for figures
 def experiment(num_init_pts,
@@ -76,7 +76,7 @@ def experiment(num_init_pts,
                    calc_acc(model, test_loader, num_classes, device)[1])))
     
     for trial in trials:
-        FED_DMGT_model = load_model(model, device)
+        DIST_DMGT_model = load_model(model, device)
         RAND_model = load_model(model, device)
         
         stream_loaders_dict = {agent: DataLoader(stream_datasets_dict[agent],
@@ -87,8 +87,8 @@ def experiment(num_init_pts,
         stream_samples_dict = {agent: enumerate(stream_loaders_dict[agent]) for agent in range(num_agents)}
         
         for sel_rnd in range(num_sel_rnds):
-            FED_DMGT_x = torch.empty(0)
-            FED_DMGT_y = torch.empty(0)
+            DIST_DMGT_x = torch.empty(0)
+            DIST_DMGT_y = torch.empty(0)
             RAND_x = torch.empty(0)
             RAND_y = torch.empty(0)
             
@@ -99,66 +99,66 @@ def experiment(num_init_pts,
             for agent in range(num_agents):
                 tau = taus[agent]
                 _, (agent_stream_x, agent_stream_y) = next(stream_samples_dict[agent])
-                agent_FED_DMGT_x, agent_FED_DMGT_y, agent_RAND_x, agent_RAND_y = get_subsets(agent_stream_x,
-                                                                                             agent_stream_y,
-                                                                                             tau,
-                                                                                             FED_DMGT_model,
-                                                                                             num_classes,
-                                                                                             rare_isoreg,
-                                                                                             common_isoreg,
-                                                                                             device)
+                agent_DIST_DMGT_x, agent_DIST_DMGT_y, agent_RAND_x, agent_RAND_y = get_subsets(agent_stream_x,
+                                                                                               agent_stream_y,
+                                                                                               tau,
+                                                                                               DIST_DMGT_model,
+                                                                                               num_classes,
+                                                                                               rare_isoreg,
+                                                                                               common_isoreg,
+                                                                                               device)
                     
                 
-                FED_DMGT_x = torch.cat((FED_DMGT_x, agent_FED_DMGT_x))                
-                FED_DMGT_y = torch.cat((FED_DMGT_y, agent_FED_DMGT_y))
+                DIST_DMGT_x = torch.cat((DIST_DMGT_x, agent_DIST_DMGT_x))                
+                DIST_DMGT_y = torch.cat((DIST_DMGT_y, agent_DIST_DMGT_y))
                 RAND_x = torch.cat((RAND_x, agent_RAND_x))                
                 RAND_y = torch.cat((RAND_y, agent_RAND_y))
             
-                ## replace previous two lines with these two if running METAFED-DMGT
+                ## replace previous two lines with these two if running Distributed DMGT w/ Filtering
                 
                 # stream_x = torch.cat((stream_x, agent_stream_x))
                 # stream_y = torch.cat((stream_y, agent_stream_y))
             
-            ## uncomment the following lines if running METAFED-DMGT
+            ## uncomment the following lines if running Distributed DMGT w/ Filtering
             
-            # FED_DMGT_x, FED_DMGT_y = get_subsets(FED_DMGT_x, FED_DMGT_y, tau, FED_DMGT_model, num_classes, rare_isoreg, common_isoreg, device)
-            # rand_idxs = torch.randperm(len(stream_x))[:len(FED_DMGT_x)]
+            # DIST_DMGT_x, DIST_DMGT_y = get_subsets(DIST_DMGT_x, DIST_DMGT_y, tau, DIST_DMGT_model, num_classes, rare_isoreg, common_isoreg, device)
+            # rand_idxs = torch.randperm(len(stream_x))[:len(DIST_DMGT_x)]
             # RAND_x = stream_x[rand_idxs]
             # RAND_y = stream_y[rand_idxs]
             
             sizes[trial,sel_rnd+1] = (
                    
                   sizes[trial,sel_rnd] + 
-                  torch.stack((torch.tensor([(FED_DMGT_y==i).float().sum() for i in range(num_classes)]),
+                  torch.stack((torch.tensor([(DIST_DMGT_y==i).float().sum() for i in range(num_classes)]),
                                torch.tensor([(RAND_y==i).float().sum() for i in range(num_classes)]))))
                   
             sum_sizes[trial,sel_rnd+1] = (
                 
-                      torch.tensor([sum_sizes[trial,sel_rnd] + len(FED_DMGT_y)]))
+                      torch.tensor([sum_sizes[trial,sel_rnd] + len(DIST_DMGT_y)]))
             
-            FED_DMGT_model = train(device,
-                                   num_epochs,
-                                   DataLoader(TensorDataset(FED_DMGT_x, FED_DMGT_y), batch_size=batch_size, num_workers=num_workers, shuffle=True),
-                                   FED_DMGT_model)
+            DIST_DMGT_model = train(device,
+                                    num_epochs,
+                                    DataLoader(TensorDataset(DIST_DMGT_x, DIST_DMGT_y), batch_size=batch_size, num_workers=num_workers, shuffle=True),
+                                    DIST_DMGT_model)
             
             RAND_model = train(device,
                                num_epochs,
                                DataLoader(TensorDataset(RAND_x, RAND_y), batch_size=batch_size, num_workers=num_workers, shuffle=True),
                                RAND_model)
                         
-            rare_isoreg = train_isoreg(FED_DMGT_model, rare_val_loader, device)
-            common_isoreg = train_isoreg(FED_DMGT_model, common_val_loader, device)
+            rare_isoreg = train_isoreg(DIST_DMGT_model, rare_val_loader, device)
+            common_isoreg = train_isoreg(DIST_DMGT_model, common_val_loader, device)
     
             rare_acc[trial,sel_rnd+1] = (
-                     torch.cat((calc_acc(FED_DMGT_model, test_loader, num_classes, device)[0], 
+                     torch.cat((calc_acc(DIST_DMGT_model, test_loader, num_classes, device)[0], 
                                 calc_acc(RAND_model, test_loader, num_classes, device)[0])))
             
             all_acc[trial,sel_rnd+1] = (
-                    torch.cat((calc_acc(FED_DMGT_model, test_loader, num_classes, device)[1],
+                    torch.cat((calc_acc(DIST_DMGT_model, test_loader, num_classes, device)[1],
                                calc_acc(RAND_model, test_loader, num_classes, device)[1])))
     
     data = rare_acc, all_acc, sizes, sum_sizes
-    df = fed_dmgt_df(data, trials, num_sel_rnds)
+    df = dist_dmgt_df(data, trials, num_sel_rnds)
     
     return df
 

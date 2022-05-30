@@ -4,8 +4,8 @@ import torch
 import argparse
 import sys
 # import internal functions
-from utils.main_exps.mnist_fed_dmgt import experiment as mnist_exp
-from utils.main_exps.imnet_fed_dmgt import experiment as imnet_exp
+from utils.main_exps.mnist_dist_dmgt import experiment as mnist_exp
+from utils.main_exps.imnet_dist_dmgt import experiment as imnet_exp
 sys.path.insert(0, '..')
 from plots.fig5_6 import plot_figure5_6
 
