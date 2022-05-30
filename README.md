@@ -1,8 +1,8 @@
 ## Paper
-[Online Active Learning with Dynamic Marginal Gain Thresholding](http://arxiv.org/abs/2201.10547)
+[Dynamic Thresholding for Online Distributed Data Selection](http://arxiv.org/abs/2201.10547)
 ```
 @article{werner2022dmgt,
-  title={Online Active Learning with Dynamic Marginal Gain Thresholding},
+  title={Dynamic Thresholding for Online Distributed Data Selection},
   author={Werner, Mariel A and Angelopoulos, Anastasios N and Bates, Stephen and Jordan, Michael I},
   journal={arXiv preprint arXiv:2201.10547},
   year={2022}
@@ -22,5 +22,5 @@ cd dmgt
 conda env create -f environment.yml
 conda activate dmgt
 cd experiments
-python run_dmgt.py(or run_fed_dmgt.py for federated version) --dataset_name 'imagenet(or mnist)' --train_path 'path/to/imagenet(or mnist)/train/' --val_path 'path/to/imagenet(or mnist)/val/'
+python run_dmgt.py(or run_dist_dmgt.py for distributed version) --dataset_name 'imagenet(or mnist)' --train_path 'path/to/imagenet(or mnist)/train/' --val_path 'path/to/imagenet(or mnist)/val/'
 ```

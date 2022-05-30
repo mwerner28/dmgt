@@ -15,9 +15,9 @@ def plot_figure5_6(df,
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     
-    plot=sns.lineplot(data=df[['sel_rnd', 'FED_DMGT_all_acc']],
+    plot=sns.lineplot(data=df[['sel_rnd', 'DIST_DMGT_all_acc']],
                       x='sel_rnd',
-                      y='FED_DMGT_all_acc',
+                      y='DIST_DMGT_all_acc',
                       color=sns.color_palette('pastel')[0],
                       ci=95,
                       estimator='mean')
@@ -31,7 +31,7 @@ def plot_figure5_6(df,
     
     sns.lineplot(data=df[['sel_rnd', 'FED_DMGT_rare_acc']],
                  x='sel_rnd',
-                 y='FED_DMGT_rare_acc',
+                 y='DIST_DMGT_rare_acc',
                  color=sns.color_palette('muted')[0],
                  linestyle='--',
                  ci=95,
@@ -57,9 +57,9 @@ def plot_figure5_6(df,
     plot.set_xlabel(None)
     plot.set_ylabel('Accuracy', fontsize=14, labelpad=7)
     
-    ax.legend(labels=['FED_DMGT: all classes',
+    ax.legend(labels=['DIST_DMGT: all classes',
                       'RAND: all classes',
-                      'FED_DMGT: rare classes',
+                      'DIST_DMGT: rare classes',
                       'RAND: rare classes'],
               loc='lower right')
 
