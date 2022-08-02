@@ -1,13 +1,3 @@
-## Paper
-[Dynamic Thresholding for Online Distributed Data Selection](http://arxiv.org/abs/2201.10547)
-```
-@article{werner2022dmgt,
-  title={Dynamic Thresholding for Online Distributed Data Selection},
-  author={Werner, Mariel A and Angelopoulos, Anastasios N and Bates, Stephen and Jordan, Michael I},
-  journal={arXiv preprint arXiv:2201.10547},
-  year={2022}
-}
-```
 ## Overview
 Given any stream of data, any assessment of its value, and any formulation of its selection cost, our method DMGT extracts the most valuable subset of the stream up to a constant factor in an online fashion. The procedure is simple (selecting each point if its marginal value given the currently selected set exceeds a threshold decided by the analyst at that time) and memory-efficient (storing only the selected subset in memory). The figure below illustrates an example in which high value is assigned to class-balanced sets. Given a class-imbalanced stream from ImageNet, DMGT selects a class-balanced subset of the stream. 
 <p align="center">
