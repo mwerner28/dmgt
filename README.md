@@ -7,7 +7,7 @@ Given any stream of data, any assessment of its value, and any formulation of it
 ## Usage
 You can reproduce the experiments in our paper by running:
 ```
-git clone https://github.com/mwerner28/dmgt
+git clone ...
 cd dmgt
 conda env create -f environment.yml
 conda activate dmgt
