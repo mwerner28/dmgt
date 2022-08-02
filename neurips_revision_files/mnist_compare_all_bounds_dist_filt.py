@@ -647,7 +647,7 @@ def experiment(num_init_pts,
                       torch.stack((torch.tensor([(cent_DIST_DMGT_UNIF_y==i).float().sum() for i in range(num_classes)]),
                                    torch.tensor([(cent_DIST_DMGT_DYN_y==i).float().sum() for i in range(num_classes)]),
                                    torch.tensor([(cent_RAND_y==i).float().sum() for i in range(num_classes)]),
-                                   torch.tensor([(cent_RAND_y==i).float().sum() for i in range(num_classes)]))))
+                                   torch.tensor([(cent_SEIVE_y==i).float().sum() for i in range(num_classes)]))))
                       
                 sum_sizes[trial,sel_round+1] = (
                           torch.tensor([sum_sizes[trial,sel_round] + len(cent_DIST_DMGT_UNIF_y)]))
